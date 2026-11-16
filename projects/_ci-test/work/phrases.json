@@ -1,0 +1,90 @@
+{
+ "duration": 19.733311,
+ "frames30": 592,
+ "source": "silence-align (cost 0.82)",
+ "segments": [
+  [
+   0.0,
+   1.811156
+  ],
+  [
+   2.230023,
+   4.017052
+  ],
+  [
+   4.481451,
+   6.17551
+  ],
+  [
+   6.617891,
+   8.405533
+  ],
+  [
+   8.800363,
+   10.611519
+  ],
+  [
+   11.006259,
+   12.817415
+  ],
+  [
+   13.23576,
+   14.99932
+  ],
+  [
+   15.48771,
+   17.159546
+  ],
+  [
+   17.600726,
+   19.411338
+  ]
+ ],
+ "phrases": [
+  {
+   "text": "This is a caption test.",
+   "s": 0.0,
+   "e": 1.811
+  },
+  {
+   "text": "The soldier stands guard.",
+   "s": 2.23,
+   "e": 4.017
+  },
+  {
+   "text": "Years go by, quietly.",
+   "s": 4.481,
+   "e": 6.176
+  },
+  {
+   "text": "Nobody tells him the news!",
+   "s": 6.618,
+   "e": 8.406
+  },
+  {
+   "text": "The empire falls.",
+   "s": 8.8,
+   "e": 10.612
+  },
+  {
+   "text": "He keeps watching the bridge.",
+   "s": 11.006,
+   "e": 12.817
+  },
+  {
+   "text": "Then someone finally asks why.",
+   "s": 13.236,
+   "e": 14.999
+  },
+  {
+   "text": "The bridge is not safe.",
+   "s": 15.488,
+   "e": 17.16
+  },
+  {
+   "text": "And he was right.",
+   "s": 17.601,
+   "e": 19.411
+  }
+ ]
+}

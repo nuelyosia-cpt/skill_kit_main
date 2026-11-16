@@ -1,0 +1,53 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Cap,Luckiest Guy,96,&H00FFFFFF&,&H00FFFFFF&,&H00201018&,&H80000000&,0,0,0,0,100,100,2,0,1,7,4,5,60,60,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:00.30,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}THIS{\c&H00FFFFFF&} IS A
+Dialogue: 0,0:00:00.30,0:00:00.60,Cap,,0,0,0,,{\pos(540,1300)}THIS {\c&H0033D7FF&}IS{\c&H00FFFFFF&} A
+Dialogue: 0,0:00:00.60,0:00:00.91,Cap,,0,0,0,,{\pos(540,1300)}THIS IS {\c&H0033D7FF&}A{\c&H00FFFFFF&}
+Dialogue: 0,0:00:00.91,0:00:01.51,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}CAPTION{\c&H00FFFFFF&} TEST
+Dialogue: 0,0:00:01.51,0:00:02.23,Cap,,0,0,0,,{\pos(540,1300)}CAPTION {\c&H0033D7FF&}TEST{\c&H00FFFFFF&}
+Dialogue: 0,0:00:02.23,0:00:02.59,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}THE{\c&H00FFFFFF&} SOLDIER
+Dialogue: 0,0:00:02.59,0:00:03.30,Cap,,0,0,0,,{\pos(540,1300)}THE {\c&H0033D7FF&}SOLDIER{\c&H00FFFFFF&}
+Dialogue: 0,0:00:03.30,0:00:03.66,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}STANDS{\c&H00FFFFFF&} GUARD
+Dialogue: 0,0:00:03.66,0:00:04.47,Cap,,0,0,0,,{\pos(540,1300)}STANDS {\c&H0033D7FF&}GUARD{\c&H00FFFFFF&}
+Dialogue: 0,0:00:04.48,0:00:04.82,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}YEARS{\c&H00FFFFFF&} GO BY
+Dialogue: 0,0:00:04.82,0:00:05.16,Cap,,0,0,0,,{\pos(540,1300)}YEARS {\c&H0033D7FF&}GO{\c&H00FFFFFF&} BY
+Dialogue: 0,0:00:05.16,0:00:05.50,Cap,,0,0,0,,{\pos(540,1300)}YEARS GO {\c&H0033D7FF&}BY{\c&H00FFFFFF&}
+Dialogue: 0,0:00:05.50,0:00:06.62,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}QUIETLY{\c&H00FFFFFF&}
+Dialogue: 0,0:00:06.62,0:00:07.38,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}NOBODY{\c&H00FFFFFF&} TELLS HIM
+Dialogue: 0,0:00:07.38,0:00:07.64,Cap,,0,0,0,,{\pos(540,1300)}NOBODY {\c&H0033D7FF&}TELLS{\c&H00FFFFFF&} HIM
+Dialogue: 0,0:00:07.64,0:00:07.89,Cap,,0,0,0,,{\pos(540,1300)}NOBODY TELLS {\c&H0033D7FF&}HIM{\c&H00FFFFFF&}
+Dialogue: 0,0:00:07.89,0:00:08.15,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}THE{\c&H00FFFFFF&} NEWS!
+Dialogue: 0,0:00:08.15,0:00:08.80,Cap,,0,0,0,,{\pos(540,1300)}THE {\c&H0033D7FF&}NEWS!{\c&H00FFFFFF&}
+Dialogue: 0,0:00:08.80,0:00:09.25,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}THE{\c&H00FFFFFF&} EMPIRE FALLS
+Dialogue: 0,0:00:09.25,0:00:10.16,Cap,,0,0,0,,{\pos(540,1300)}THE {\c&H0033D7FF&}EMPIRE{\c&H00FFFFFF&} FALLS
+Dialogue: 0,0:00:10.16,0:00:11.01,Cap,,0,0,0,,{\pos(540,1300)}THE EMPIRE {\c&H0033D7FF&}FALLS{\c&H00FFFFFF&}
+Dialogue: 0,0:00:11.01,0:00:11.31,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}HE{\c&H00FFFFFF&} KEEPS WATCHING
+Dialogue: 0,0:00:11.31,0:00:11.61,Cap,,0,0,0,,{\pos(540,1300)}HE {\c&H0033D7FF&}KEEPS{\c&H00FFFFFF&} WATCHING
+Dialogue: 0,0:00:11.61,0:00:12.21,Cap,,0,0,0,,{\pos(540,1300)}HE KEEPS {\c&H0033D7FF&}WATCHING{\c&H00FFFFFF&}
+Dialogue: 0,0:00:12.21,0:00:12.52,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}THE{\c&H00FFFFFF&} BRIDGE
+Dialogue: 0,0:00:12.52,0:00:13.24,Cap,,0,0,0,,{\pos(540,1300)}THE {\c&H0033D7FF&}BRIDGE{\c&H00FFFFFF&}
+Dialogue: 0,0:00:13.24,0:00:13.46,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}THEN{\c&H00FFFFFF&} SOMEONE
+Dialogue: 0,0:00:13.46,0:00:13.90,Cap,,0,0,0,,{\pos(540,1300)}THEN {\c&H0033D7FF&}SOMEONE{\c&H00FFFFFF&}
+Dialogue: 0,0:00:13.90,0:00:14.56,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}FINALLY{\c&H00FFFFFF&} ASKS
+Dialogue: 0,0:00:14.56,0:00:14.78,Cap,,0,0,0,,{\pos(540,1300)}FINALLY {\c&H0033D7FF&}ASKS{\c&H00FFFFFF&}
+Dialogue: 0,0:00:14.78,0:00:15.45,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}WHY{\c&H00FFFFFF&}
+Dialogue: 0,0:00:15.49,0:00:15.82,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}THE{\c&H00FFFFFF&} BRIDGE IS
+Dialogue: 0,0:00:15.82,0:00:16.16,Cap,,0,0,0,,{\pos(540,1300)}THE {\c&H0033D7FF&}BRIDGE{\c&H00FFFFFF&} IS
+Dialogue: 0,0:00:16.16,0:00:16.49,Cap,,0,0,0,,{\pos(540,1300)}THE BRIDGE {\c&H0033D7FF&}IS{\c&H00FFFFFF&}
+Dialogue: 0,0:00:16.49,0:00:16.82,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}NOT{\c&H00FFFFFF&} SAFE
+Dialogue: 0,0:00:16.82,0:00:17.60,Cap,,0,0,0,,{\pos(540,1300)}NOT {\c&H0033D7FF&}SAFE{\c&H00FFFFFF&}
+Dialogue: 0,0:00:17.60,0:00:18.05,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}AND{\c&H00FFFFFF&} HE
+Dialogue: 0,0:00:18.05,0:00:18.51,Cap,,0,0,0,,{\pos(540,1300)}AND {\c&H0033D7FF&}HE{\c&H00FFFFFF&}
+Dialogue: 0,0:00:18.51,0:00:18.96,Cap,,0,0,0,,{\pos(540,1300)\fscx86\fscy86\t(0,90,\fscx104\fscy104)\t(90,160,\fscx100\fscy100)}{\c&H0033D7FF&}WAS{\c&H00FFFFFF&} RIGHT
+Dialogue: 0,0:00:18.96,0:00:20.01,Cap,,0,0,0,,{\pos(540,1300)}WAS {\c&H0033D7FF&}RIGHT{\c&H00FFFFFF&}

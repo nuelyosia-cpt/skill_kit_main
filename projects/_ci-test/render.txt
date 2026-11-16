@@ -1,6 +1,6 @@
-# Pipeline self-test on the worked example (stand-in tone voice). Safe to delete.
+# Pipeline self-test on the worked example (tone voice, dummy script for captions). Safe to delete.
 mode: full
 title: CI self-test
-frames: 0-59
+frames: 0-89
 shards: 2
 release: no
