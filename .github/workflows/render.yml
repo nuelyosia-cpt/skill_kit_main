@@ -1,0 +1,158 @@
+# Renders a cartoon short when projects/<slug>/render.txt is pushed (or by hand from the Actions tab).
+#   mode: stills -> renders the "stills" frames, commits projects/<slug>/stills/sheet_ci.jpg back
+#   mode: full   -> renders every frame in parallel shards, mixes, encodes, runs QA,
+#                   publishes <slug>.mp4 as a GitHub Release and commits out/RESULT.md + out/qa_sheet.jpg back
+# Every run (pass or fail) commits projects/<slug>/out/STATUS.md so Claude can read the result with git pull.
+name: render
+on:
+  push:
+    paths: ["projects/*/render.txt"]
+  workflow_dispatch:
+    inputs:
+      slug: { description: "project folder name under projects/", required: true }
+permissions:
+  contents: write
+concurrency:
+  group: render-${{ github.ref }}-${{ inputs.slug || github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  prep:
+    runs-on: ubuntu-latest
+    outputs:
+      slug: ${{ steps.req.outputs.slug }}
+      mode: ${{ steps.req.outputs.mode }}
+      title: ${{ steps.req.outputs.title }}
+      stills: ${{ steps.req.outputs.stills }}
+      frames: ${{ steps.req.outputs.frames }}
+      total: ${{ steps.req.outputs.total }}
+      shards: ${{ steps.req.outputs.shards }}
+      nshards: ${{ steps.req.outputs.nshards }}
+      release: ${{ steps.req.outputs.release }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - run: command -v ffprobe >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null; }
+      - id: req
+        env: { INPUT_SLUG: "${{ inputs.slug }}", BEFORE: "${{ github.event.before }}" }
+        run: bash scripts/ci/request.sh
+
+  stills:
+    needs: prep
+    if: needs.prep.outputs.mode == 'stills'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env: { P: "projects/${{ needs.prep.outputs.slug }}" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-kit
+        with: { project: "projects/${{ needs.prep.outputs.slug }}", browser: "true" }
+      - name: Render stills and contact sheet
+        working-directory: ${{ env.P }}
+        run: |
+          set -o pipefail; mkdir -p out
+          rm -rf stills/ci
+          node render.mjs stills/ci "${{ needs.prep.outputs.stills }}" 2>&1 | tee out/ci.log
+          python sheet.py stills/ci stills/sheet_ci.jpg 2>&1 | tee -a out/ci.log
+          grep -q "^ERR" out/ci.log && { echo "page errors above"; exit 1; } || true
+      - name: Commit sheet back
+        run: |
+          bash scripts/ci/status.sh "${{ needs.prep.outputs.slug }}" "stills done" stills "$P/out/ci.log"
+          bash scripts/ci/commit-back.sh "render-bot: stills sheet for ${{ needs.prep.outputs.slug }}" "$P/stills/sheet_ci.jpg" "$P/out/STATUS.md"
+      - name: Report failure
+        if: failure()
+        run: |
+          bash scripts/ci/status.sh "${{ needs.prep.outputs.slug }}" "FAILED" stills "$P/out/ci.log"
+          bash scripts/ci/commit-back.sh "render-bot: stills FAILED for ${{ needs.prep.outputs.slug }}" "$P/out/STATUS.md"
+
+  render:
+    needs: prep
+    if: needs.prep.outputs.mode == 'full'
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    strategy:
+      fail-fast: true
+      matrix:
+        shard: ${{ fromJSON(needs.prep.outputs.shards) }}
+    env: { P: "projects/${{ needs.prep.outputs.slug }}" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-kit
+        with: { project: "projects/${{ needs.prep.outputs.slug }}", browser: "true" }
+      - name: Render frames
+        working-directory: ${{ env.P }}
+        run: |
+          set -o pipefail; mkdir -p out frames
+          RANGE=$(bash ../../scripts/ci/shard.sh "${{ needs.prep.outputs.frames }}" ${{ matrix.shard }} ${{ needs.prep.outputs.nshards }})
+          echo "shard ${{ matrix.shard }}: frames $RANGE"
+          [ -z "$RANGE" ] || node render.mjs frames "$RANGE" 2>&1 | tee out/ci.log
+          grep -q "^ERR" out/ci.log 2>/dev/null && { echo "page errors above"; exit 1; } || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frames-${{ matrix.shard }}
+          path: ${{ env.P }}/frames/
+          retention-days: 3
+          if-no-files-found: ignore
+          compression-level: 0
+      - name: Report failure
+        if: failure()
+        run: |
+          bash scripts/ci/status.sh "${{ needs.prep.outputs.slug }}" "FAILED" "render shard ${{ matrix.shard }}" "$P/out/ci.log"
+          bash scripts/ci/commit-back.sh "render-bot: render FAILED for ${{ needs.prep.outputs.slug }}" "$P/out/STATUS.md"
+
+  finish:
+    needs: [prep, render]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env: { P: "projects/${{ needs.prep.outputs.slug }}", SLUG: "${{ needs.prep.outputs.slug }}" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-kit
+        with: { project: "projects/${{ needs.prep.outputs.slug }}" }
+      - uses: actions/download-artifact@v4
+        with: { pattern: "frames-*", merge-multiple: true, path: "${{ env.P }}/frames" }
+      - name: Sound, mix, encode, QA
+        working-directory: ${{ env.P }}
+        run: |
+          set -o pipefail; mkdir -p out
+          A=$(echo "${{ needs.prep.outputs.frames }}" | cut -d- -f1)
+          if [ "$A" != "0" ]; then   # test range not starting at 0: renumber so ffmpeg finds f0000.jpg
+            i=0; for f in $(ls frames/f*.jpg | sort); do mv "$f" "frames/n$(printf %04d $i).jpg"; i=$((i+1)); done
+            for f in frames/n*.jpg; do mv "$f" "frames/f${f#frames/n}"; done
+          fi
+          echo "frames: $(ls frames | wc -l) of ${{ needs.prep.outputs.total }}" | tee out/ci.log
+          python audio.py 2>&1 | tee -a out/ci.log
+          python mix.py voice.mp3 music.wav sfx.wav 2>&1 | tee -a out/ci.log
+          bash finish.sh "$SLUG" 2>&1 | tee -a out/ci.log
+          test -s "out/$SLUG.mp4"
+      - name: Publish release
+        id: rel
+        if: needs.prep.outputs.release != 'no'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.SLUG }}-r${{ github.run_number }}
+          name: ${{ needs.prep.outputs.title }}
+          target_commitish: ${{ github.sha }}
+          body: "Rendered from ${{ github.sha }}. Download ${{ env.SLUG }}.mp4 below. QA log: projects/${{ env.SLUG }}/out/RESULT.md"
+          files: |
+            ${{ env.P }}/out/${{ env.SLUG }}.mp4
+            ${{ env.P }}/out/qa_sheet.jpg
+      - uses: actions/upload-artifact@v4
+        with: { name: "${{ env.SLUG }}-mp4", path: "${{ env.P }}/out/${{ env.SLUG }}.mp4", retention-days: 14 }
+      - name: Commit result back
+        run: |
+          O="$P/out"; MP4="$O/$SLUG.mp4"
+          {
+            echo "# Render result: ${{ needs.prep.outputs.title }}"; echo
+            echo "- MP4: ${{ steps.rel.outputs.url || 'no release (release: no) - see the run artifacts' }}"
+            echo "- length: $(ffprobe -v error -show_entries format=duration -of csv=p=0 "$MP4") s, size: $(stat -c %s "$MP4") bytes"
+            echo "- run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"; echo
+            echo "## Mix and QA log"; echo; echo '```'; cat "$O/ci.log"; echo '```'
+          } > "$O/RESULT.md"
+          bash scripts/ci/status.sh "$SLUG" "done" finish
+          bash scripts/ci/commit-back.sh "render-bot: $SLUG rendered" "$O/RESULT.md" "$O/qa_sheet.jpg" "$O/STATUS.md"
+      - name: Report failure
+        if: failure()
+        run: |
+          bash scripts/ci/status.sh "$SLUG" "FAILED" finish "$P/out/ci.log"
+          bash scripts/ci/commit-back.sh "render-bot: finish FAILED for $SLUG" "$P/out/STATUS.md"

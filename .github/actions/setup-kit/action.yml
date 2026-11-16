@@ -1,0 +1,23 @@
+name: Set up the cartoon kit
+description: Node 22, Python with numpy and Pillow, ffmpeg, the project's generated files and (optionally) Playwright Chromium.
+inputs:
+  project: { description: "projects/<slug>", required: true }
+  browser: { description: "install Playwright Chromium", required: false, default: "false" }
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with: { node-version: "22" }
+    - uses: actions/setup-python@v5
+      with: { python-version: "3.12" }
+    - shell: bash
+      run: |
+        pip install -q numpy pillow
+        command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null; }
+    - shell: bash
+      env: { NO_PLAYWRIGHT: "${{ inputs.browser != 'true' && '1' || '' }}" }
+      run: bash scripts/prepare-project.sh "${{ inputs.project }}"
+    - if: inputs.browser == 'true'
+      shell: bash
+      working-directory: ${{ inputs.project }}
+      run: npx playwright install --with-deps chromium
