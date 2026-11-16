@@ -17,7 +17,7 @@ Secondary theme, allowed when it fits: how an infamous object or person came to 
 ## Rules
 - Stories, characters and shots are always original (our own drawings, our own words), but the subject is a real inventor, discovery or invention.
 - **Facts first.** Every story must be a real fact or a clearly labelled legend. Make it interesting by adding surrounding background that is also true: the era, the rival, the failed attempts, the odd detail, the consequence.
-- **Fact-status honesty.** Many famous eureka moments are anecdotes, not documented events. Always say which kind it is, in the idea list and in the script when relevant: *documented* (primary sources, the inventor's own notes), *anecdote* (told by a contemporary or the inventor late in life), or *legend* (unverifiable or probably embellished). Use "the story goes" / "legend says" in the narration for anything that is not documented. Never present a legend as settled fact. A myth-vs-reality twist (e.g. "the apple never hit his head") is a great payoff.
+- **Fact-status honesty.** Many famous eureka moments are anecdotes, not documented events. Always say which kind it is, in the idea list and in the script when relevant: *documented* (primary sources, the inventor's own notes), *anecdote* (told by a contemporary or the inventor late in life), or *legend* (unverifiable or probably embellished). Use "the story goes" / "legend says" in the narration for anything that is not documented. Never present a legend as settled fact. A myth-vs-reality twist (e.g. "the apple never hit his head") is one great way to end, but not the only one (see the ending types in Stage 3).
 - Real historical figures who are dead are fine as characters. No living people as the butt of a joke, nothing graphic, nothing political. Keep rivalries (e.g. Newton vs Leibniz) factual and even-handed.
 - **Captions are always on.** Every video has burned-in captions that follow the voice word by word (see 4.9). They use the exact script text and the timing in `work/words.json`; never retype or paraphrase them. Diegetic text (a carved message, a sign, a chalk diagram, a notebook page) is also fine, and it must read correctly (not mirrored).
 - Never edit or re-time the voice. The picture is timed to it, and every visual reaction lands 0-3 frames before its word.
@@ -37,7 +37,10 @@ Give exactly 10 ideas in one reply, numbered, and ask the user to reply with a n
 - **Title** (5-8 words, curiosity-driven, e.g. "The Apple That Never Hit Newton").
 - **Hook line**: the first spoken sentence, a paradox or surprising claim stated as fact ("Isaac Newton invented calculus while hiding from a plague.").
 - **The eureka**: the exact moment or insight, in one line.
-- **The twist**: the ironic or surprising payoff that ends the video (the consequence, the rivalry, the myth-vs-reality reveal).
+- **The ending**: the last beat of the video, and say which type it is. It does **not** have to be a plot twist. Pick whichever fits the story best:
+  - *Twist*: an ironic or surprising reveal (the consequence nobody expected, the rivalry, the myth-vs-reality reveal).
+  - *Moral*: a short lesson or value the story shows ("Sometimes the best defense is letting your enemy scare himself.").
+  - *Engagement*: a closing line that emphasizes the idea or the person and leaves the viewer impressed or curious (what it changed, why it still matters, a question back to the viewer).
 - **Why it animates well**: the 2-3 big visual moments (the apple drop, the overflowing bath, equations appearing in the air).
 - **Fact status**: *documented*, *anecdote* or *legend*, with one line saying where the story comes from.
 
@@ -56,7 +59,7 @@ Write the narration only (no stage directions in the spoken text), sized at abou
 2. **Setting** in 1-2 lines: when, where, who, a concrete detail (the year, the place, what they were doing instead).
 3. **The problem and the struggle**, 2-3 beats, each bigger: what nobody could explain or build, failed attempts, doubters, obsession. Use one exaggeration joke.
 4. **The eureka** ("But then..." / "Then, one day..."): the moment of insight, with the real mechanism explained through an everyday analogy. Label it "the story goes" if it is an anecdote.
-5. **Payoff / twist**: short, ironic or awe-inducing, and the last words of the video (what it changed, the rival who disputed it, or the myth-vs-reality reveal).
+5. **Ending**: one or two short lines, and the last words of the video. Use one of the three ending types from Stage 2: a *twist* (what it changed, the rival who disputed it, the myth-vs-reality reveal), a *moral* (the lesson or value the story shows), or an *engagement* line (emphasizes the idea or the person, why it still matters, or a question to the viewer). A twist is optional: when the story already ends on a strong moment, a moral or an engagement line is often better than forcing a reveal. Whatever the type, keep the fact rules: a legend stays labelled as a legend.
 Use plain spoken English, contractions, sentences around 8-15 words, and numbers written as words. Never describe what the viewer already sees. Explain a concept in one clear picture, not three.
 
 Then reply with:
@@ -94,8 +97,7 @@ Make one row per shot: frames, words, setting, light, camera move, characters/po
 - Use light for beats: day for normal, golden for decline or drama, night-blue for explanation or deep thought. A time jump gets a 6-frame white flash.
 - **Stage the eureka moment as the centre of the video.** Build to it with a slow push-in on the inventor's face, then a 2-3 frame freeze/hold, a bright ping (glow or star burst effect card), the key object doing its thing (apple dropping, water spilling over the tub, numbers or curves drawing themselves), a quick reaction close-up, then a wide release. Sting + a rising SFX on the realisation.
 - **Show the idea as a picture.** Use diegetic cards for the insight: a chalk or ink diagram, a notebook page, a curve cut into strips, orbits around a planet. Draw them correctly (not mirrored) and animate them appearing (0..1 progress).
-- Show the invention's consequence in the payoff shot (the thing it became, the rival's reaction, the myth being corrected).
-- The twist line gets a sting (music stops, low hit, push-in with roll). The last shot's physical payoff lands on the final word.
+- The ending shot matches the ending type. **Twist**: show the consequence or the myth being corrected; the twist line gets a sting (music stops, low hit, push-in with roll). **Moral**: a calm hero shot of the person (warm or golden light, a small gesture like a smile, nod or wink on the key word), then a release to a wide that shows the whole story place. **Engagement**: show the idea or invention at its biggest (the thing it became, the person with their creation, the world it changed). The last shot's physical payoff lands on the final word.
 - **Keep the caption band clear.** Captions sit centred at y ≈ 1300 px (68 % of the height), about 1180-1420 px. Frame faces, eyes, the key object and diagram cards in the upper 60 % of the picture (y < 1150), so the caption never covers them. Busy, bright detail right behind the band makes captions harder to read: prefer ground, deck, water or a darker area there.
 
 ### 4.3 World (`web/main.js`)
@@ -137,8 +139,8 @@ Send the sheet to the user with a one-line shot summary, then start the full ren
 
 ### 4.7 Sound (`audio.py` → stems → `mix.py`)
 Rewrite the cue table for the story; the synths stay. `audio.py` writes only stems (`music.wav`, `sfx.wav`).
-- Music: a short curious, light loop suited to the era (plucked bass, soft kick/snare, pad or light brass). It stops at the twist line, then a low drone continues. A rising shimmer leads into the eureka.
-- SFX on events (in frames/30): whooshes on big moves, thunk on drops and stamps, splash and slosh for water, rumble+crash on collapses, scrape on metal, **ting/sparkle on the eureka**, sting on the twist, creaks, snap, snore, leaves, scribble/chalk for diagrams, water ambience.
+- Music: a short curious, light loop suited to the era (plucked bass, soft kick/snare, pad or light brass). A rising shimmer leads into the eureka. For a *twist* ending the music stops at the twist line and a low drone continues. For a *moral* or *engagement* ending, keep the music (or let a short tension drop resolve back into it) and end on a warm resolving chord on the final word.
+- SFX on events (in frames/30): whooshes on big moves, thunk on drops and stamps, splash and slosh for water, rumble+crash on collapses, scrape on metal, **ting/sparkle on the eureka**, sting on the twist (if there is one), a soft resolving hit on the last word for moral/engagement endings, creaks, snap, snore, leaves, scribble/chalk for diagrams, water ambience.
 - Mix with `python3 mix.py voice.mp3 music.wav sfx.wav`. It sets music to exactly 50 % of the voice's gated RMS (−6 dB) and SFX to 50 % with peaks capped at 0.7× the voice peak. It prints the measured levels: confirm music shows −6.0 dB vs voice and SFX is at or below that.
 - Lock picture timing before making sound. Any timing change means re-running audio.py and mix.py.
 

@@ -25,7 +25,7 @@ Show the newest `ideas/*.md` list (numbered, with the Recommended pick), skippin
 ## When the user says "new video" (or gives a topic, or picks an idea number)
 Do all of this yourself. Ask the user only at the two points marked USER.
 
-1. **Ideas.** Follow SKILL.md stage 2. Web-search every idea's key facts first. Give exactly 10 numbered ideas with title, hook, eureka, twist, why it animates, and fact status (documented / anecdote / legend). Mark your single best pick as "Recommended". Save them as `ideas/<today>.md`. Use AskUserQuestion if available. Skip this step if the user already picked from a saved list.
+1. **Ideas.** Follow SKILL.md stage 2. Web-search every idea's key facts first. Give exactly 10 numbered ideas with title, hook, eureka, ending (twist, moral or engagement; SKILL.md stage 2), why it animates, and fact status (documented / anecdote / legend). Mark your single best pick as "Recommended". Save them as `ideas/<today>.md`. Use AskUserQuestion if available. Skip this step if the user already picked from a saved list.
    **USER: picks a number** (or gives their own topic).
 2. **Script.** Follow SKILL.md stage 3. Target about 60 s: 200-215 words at the user's ElevenLabs voice (about 3.3 words per second). Say "supposedly" / "the story goes" for anything that is not documented. Run `bash scripts/new-project.sh <slug>`, save `projects/<slug>/script.txt`, add the idea to `ideas/USED.md`, show the script in chat with the word count. In cloud mode commit and push now, so the script is safe.
 3. **Voiceover.**
