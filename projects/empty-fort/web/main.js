@@ -30,12 +30,6 @@ const M = {
   iron: toon({ color: '#5c5a57' }), bronze: toon({ color: '#b08a4a' }), wood: toon({ color: '#7a5434' }), door: toon({ color: '#5a3a24' }),
   window: toon({ color: '#2b2430' }), red: toon({ color: '#b8282b' }),
 };
-M.banner = new THREE.MeshToonMaterial({ gradientMap: grad, map: P.tex(P.banner()), alphaTest: 0.5, side: THREE.DoubleSide });
-// helmet
-const helmetIn = P.tex(P.helmetInside()); helmetIn.wrapS = helmetIn.wrapT = THREE.ClampToEdgeWrapping;
-M.helmIn = new THREE.MeshToonMaterial({ gradientMap: grad, map: helmetIn, side: THREE.BackSide });
-M.helmOut = toon({ color: '#8f8a7e' });
-
 // ---------- ink / normal-depth contract ----------
 const NOINK = 'noink'; // userData flag: never outlined (cards, fx, water handled specially)
 const ndMat = new THREE.ShaderMaterial({
@@ -88,139 +82,143 @@ scene.add(sun); scene.add(sun.target);
 scene.fog = new THREE.Fog('#ffffff', 40, 600);
 
 // ---------- world ----------
-const DECK = 6, HALF = 26, BW = 2.3; // deck top height, half length, half width
+const DECK = 0, WH = 7, WT = 5; // ground, wall height, wall thickness (gate at x=0, plain is +x, town is -x)
 const world = new THREE.Group(); scene.add(world);
-// river
-const waterU = { t: { value: 0 }, deep: { value: new THREE.Color('#2f6f8f') }, shal: { value: new THREE.Color('#5fa8bf') }, glint: { value: new THREE.Color('#e9f6ff') } };
-const waterMat = new THREE.ShaderMaterial({
-  uniforms: { ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog), ...waterU }, fog: true,
-  vertexShader: `#include <fog_pars_vertex>
-    varying vec3 vW; void main(){ vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; vec4 mvPosition = viewMatrix*w; gl_Position = projectionMatrix*mvPosition;
-    #include <fog_vertex>
-    }`,
-  fragmentShader: `#include <fog_pars_fragment>
-    uniform float t; uniform vec3 deep, shal, glint; varying vec3 vW;
-    float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
-    float noise(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f); return mix(mix(hash(i),hash(i+vec2(1,0)),f.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x), f.y); }
-    void main(){ vec2 p = vW.xz*vec2(.35,.12) + vec2(0., -t*.25);
-      float n = noise(p) * .6 + noise(p*2.3 + 7.) * .4; float edge = smoothstep(10., 17., abs(vW.x));
-      vec3 c = mix(deep, shal, .35 + .4*n + .4*edge);
-      float streak = smoothstep(.72, .78, noise(vW.xz*vec2(.8,.09) + vec2(0., -t*.6))) * (1.-edge*.5);
-      c = mix(c, glint, streak*.75);
-      gl_FragColor = vec4(c,1.);
-      #include <fog_fragment>
-    }`,
-});
-const water = new THREE.Mesh(new THREE.PlaneGeometry(60, 2300), waterMat); water.rotation.x = -Math.PI / 2; water.position.y = 0;
-water.userData.nd = waterNd; water.receiveShadow = false; scene.add(water);
-// banks: flat top at DECK, slope to the water
-const bankGeo = (s) => { // s=-1 near (x<0), +1 far
-  const shape = new THREE.Shape(); shape.moveTo(14.5 * s, -1.2); shape.lineTo(20.5 * s, DECK - 0.02); shape.lineTo(1150 * s, DECK - 0.02); shape.lineTo(1150 * s, -1.2);
-  const g = new THREE.ExtrudeGeometry(shape, { depth: 2300, bevelEnabled: false }); g.translate(0, 0, -1150); return g;
+const MX = {
+  steppe: texM(P.steppe(25), 70, 70), dirt: texM(P.dirt(7), 3, 40), yard: texM(P.dirt(17), 10, 10),
+  brick: texM(P.brick(21), 1, 1), earth: texM(P.earth(22), 1, 1), door: texM(P.doorRed(23), 1, 1), tiles: texM(P.tiles(24), 1, 1),
+  red: toon({ color: '#a8302a' }), redDark: toon({ color: '#6e1e1a' }), wood: toon({ color: '#6a4228' }), lacquer: toon({ color: '#3a2218' }),
+  tileDark: toon({ color: '#3d424b' }), plaster: texM(P.plaster(8, 40), 1, 1), iron: toon({ color: '#3c3a38' }), fire: toon({ color: '#ff9a2a', emissive: '#ff7a10', emissiveIntensity: 0.6 }),
+  armor: toon({ color: '#4a4e58' }), skin: toon({ color: '#e2ad80' }), spear: toon({ color: '#7a5a3a' }), tassel: toon({ color: '#c8302c' }),
+  rock: toon({ color: '#9a9070' }), rockTop: toon({ color: '#7f9a5a' }), poplar: toon({ color: '#6f9a3c' }), willow: toon({ color: '#8ab04a' }),
+  hill: toon({ color: '#a8ad62' }), hillFar: toon({ color: '#9cad78' }), mount: toon({ color: '#8fa0b4' }), snow: toon({ color: '#f4f6fa' }), trunk: toon({ color: '#6a4a32' }),
 };
-const bankMat = M.grass.clone(); bankMat.map = M.grass.map.clone(); bankMat.map.repeat.set(0.25, 0.25); bankMat.map.needsUpdate = true;
-for (const s of [-1, 1]) add(bankGeo(s), [M.dirt, bankMat], 0, 0, 0, world, { cast: false });
-// path from the gate to the village (near bank)
-const road = add(new THREE.PlaneGeometry(40, 4.2), M.dirt, -46, DECK + 0.01, 0, world, { cast: false }); road.rotation.x = -Math.PI / 2;
-const road2 = add(new THREE.PlaneGeometry(40, 4.2), M.dirt, 46, DECK + 0.01, 0, world, { cast: false }); road2.rotation.x = -Math.PI / 2;
-// stone abutments
-for (const s of [-1, 1]) add(tbox(7, DECK + 1.5, 6.4, 2.4), M.stone, s * 21.2, (DECK - 1.5) / 2 - 0.25, 0, world);
-// deck
-const deck = add(tbox(HALF * 2 - 2, 0.28, BW * 2, 1), M.plank, 0, DECK - 0.14, 0, world);
-{ const uv = deck.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i), uv.getY(i)); }
-M.plank.map.rotation = Math.PI / 2;
-// stringers and cap beams
-for (const z of [-1.6, 0, 1.6]) add(tbox(HALF * 2 - 4, 0.45, 0.35, 2), M.beam, 0, DECK - 0.5, z, world);
-const PILES_X = [-12, -6, 0, 6, 12], piles = [];
-for (const x of PILES_X) {
-  add(tbox(0.5, 0.45, BW * 2 + 0.6, 2), M.beam, x, DECK - 0.95, 0, world);
-  for (const z of [-1.8, 0, 1.8]) {
-    const g = new THREE.CylinderGeometry(0.3, 0.34, DECK + 1.2, 12, 1); const pm = add(g, z === 0 ? M.rotB : M.rot, x, (DECK - 1.2) / 2 - 0.6, z, world);
-    piles.push(pm);
-  }
-  // X braces across the bent
-  for (const s of [-1, 1]) { const b = add(tbox(0.18, 6.0, 0.22, 2), M.beamDark, x + 0.32, 2.8, 0, world); b.rotation.x = s * Math.atan2(3.6, 5.6); }
+const zTop = P.tex(P.zitherTop()); zTop.wrapS = zTop.wrapT = THREE.ClampToEdgeWrapping; MX.zither = toon({ map: zTop });
+const flagMat = (col) => new THREE.MeshToonMaterial({ gradientMap: grad, map: P.tex(P.flag(col)), alphaTest: 0.5, side: THREE.DoubleSide });
+MX.flagShu = flagMat('#3f8a4a'); MX.flagWei = flagMat('#c9302c');
+const faces6 = (side, top) => [side, side, top, side, side, side];
+// ground, road and town yard
+const ground = add(new THREE.PlaneGeometry(2400, 2400), MX.steppe, 0, 0, 0, world, { cast: false }); ground.rotation.x = -Math.PI / 2;
+const road = add(new THREE.PlaneGeometry(240, 5.2), MX.dirt, 122, 0.02, 0, world, { cast: false }); road.rotation.x = -Math.PI / 2;
+const yard = add(new THREE.PlaneGeometry(56, 70), MX.yard, -30, 0.015, 0, world, { cast: false }); yard.rotation.x = -Math.PI / 2;
+// the wall: two long runs either side of the gate, lintel over the gate, side walls running back into town
+const wallMats = faces6(MX.brick, MX.earth);
+for (const s of [-1, 1]) {
+  add(tbox(WT, WH, 59.6, 2.4), wallMats, 0, WH / 2, s * (2.4 + 29.8), world);
+  add(tbox(70, WH, WT, 2.4), wallMats, -35 + WT / 2, WH / 2, s * 62, world);
 }
-// longitudinal diagonal braces between bents (one breaks in shot 8)
-const braces = [];
-for (let i = 0; i < PILES_X.length - 1; i++) for (const z of [-1.8, 1.8]) {
-  const x0 = PILES_X[i], x1 = PILES_X[i + 1], L = Math.hypot(6, 3.4);
-  const b = add(tbox(L, 0.22, 0.18, 2), M.beamDark, (x0 + x1) / 2, 3.2, z + Math.sign(z) * 0.36, world); b.rotation.z = (i % 2 ? 1 : -1) * Math.atan2(3.4, 6);
-  braces.push(b);
+add(tbox(WT, 2, 4.8, 2.4), wallMats, 0, WH - 1, 0, world);
+// gate passage lining (dark inside)
+add(tbox(WT - 0.2, 0.2, 4.8, 2), MX.lacquer, 0, WH - 2.1, 0, world, { cast: false });
+// crenellations on the outer edge + low inner parapet
+const merlonGeo = tbox(0.7, 1.05, 1.0, 1.2);
+for (let z = -61; z <= 61; z += 1.75) { if (Math.abs(z) < 2.2) continue; add(merlonGeo, MX.brick, WT / 2 - 0.35, WH + 0.52, z, world); }
+for (const s of [-1, 1]) add(tbox(0.4, 0.55, 58, 2), MX.brick, -WT / 2 + 0.2, WH + 0.27, s * 33, world);
+// gate doors (pivot groups; open swings inward to -x)
+const doors = [];
+for (const s of [-1, 1]) {
+  const g = new THREE.Group(); g.position.set(1.15, 0, s * 2.4); world.add(g);
+  add(tbox(0.25, 5, 2.4, 2.4), faces6(MX.door, MX.lacquer), 0, 2.5, -s * 1.2, g);
+  add(new THREE.TorusGeometry(0.16, 0.04, 6, 14), toon({ color: '#d9a845' }), 0.16, 2.4, -s * 2.0, g).rotation.y = Math.PI / 2;
+  g.userData.s = s; doors.push(g);
 }
-// bracket fungus + hanging moss on piles (3D, inked)
-const fung = toon({ color: '#e9dcb8' }), mossM = toon({ color: '#557a2e' });
-{ const r = P.rng(31); for (const pm of piles) for (let k = 0; k < 4; k++) {
-  const y = 1 + r() * 3.5, a = r() * 6.28, f = add(new THREE.SphereGeometry(0.22 + r() * 0.12, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2), fung, pm.position.x + Math.cos(a) * 0.3, y, pm.position.z + Math.sin(a) * 0.3, world);
-  f.scale.set(1, 0.35, 1); f.rotation.y = a;
-  if (k < 2) { const mo = add(new THREE.ConeGeometry(0.12, 0.6 + r() * 0.5, 5), mossM, pm.position.x + Math.cos(a + 2) * 0.32, DECK - 1.4 - r() * 0.4, pm.position.z + Math.sin(a + 2) * 0.32, world); mo.rotation.x = Math.PI; }
-} }
-// railings
-for (let x = -HALF + 2; x <= HALF - 2; x += 2.5) for (const z of [-BW + 0.12, BW - 0.12]) add(tbox(0.16, 1.15, 0.16, 1), M.beam, x, DECK + 0.57, z, world);
-for (const z of [-BW + 0.12, BW - 0.12]) { add(tbox(HALF * 2 - 4, 0.16, 0.2, 2), M.beam, 0, DECK + 1.12, z, world); add(tbox(HALF * 2 - 4, 0.1, 0.12, 2), M.beam, 0, DECK + 0.6, z, world); }
-// gate at the near end (x=-20.2)
-const gate = new THREE.Group(); world.add(gate);
-const gateStone = [];
-for (const z of [-2.95, 2.95]) { gateStone.push(add(tbox(1.1, 5.2, 1.1, 1.6), M.stone, -20.2, DECK + 2.6, z, gate)); gateStone.push(add(tbox(1.4, 0.4, 1.4, 1.6), M.stone, -20.2, DECK + 5.3, z, gate)); }
-gateStone.push(add(tbox(1.2, 0.9, 7.2, 1.6), M.stone, -20.2, DECK + 5.9, 0, gate));
-const eagle = add(new THREE.ConeGeometry(0.35, 0.9, 4), M.bronze, -20.2, DECK + 6.8, 0, gate);
-// banner pole + banner
-const bannerG = new THREE.Group(); bannerG.position.set(-22.6, DECK, -3.3); world.add(bannerG);
-add(new THREE.CylinderGeometry(0.07, 0.07, 6.2, 8), M.wood, 0, 3.1, 0, bannerG);
-add(new THREE.CylinderGeometry(0.05, 0.05, 1.6, 8), M.wood, 0, 5.9, 0, bannerG).rotation.x = Math.PI / 2;
-const bannerCloth = add(new THREE.PlaneGeometry(1.4, 2.8, 8, 8), M.banner, 0.06, 4.4, 0, bannerG); bannerCloth.rotation.y = Math.PI / 2;
-bannerCloth.userData.cloth = bannerCloth.geometry.attributes.position.array.slice();
-// guard hut next to the gate
-const hut = new THREE.Group(); hut.position.set(-25.5, DECK, -6.2); world.add(hut);
-add(tbox(4, 3.2, 3.4, 2), M.stone, 0, 1.6, 0, hut);
-const hr = add(new THREE.ConeGeometry(3.2, 1.6, 4), M.roof, 0, 4.0, 0, hut); hr.rotation.y = Math.PI / 4; hr.scale.set(1, 1, 0.85);
-add(box(1, 1.9, 0.1), M.door, 0.6, 0.95, 1.72, hut);
-// temple on the far hill
-const TEMPLE = new THREE.Vector3(62, 0, -16);
-const hill = add(new THREE.SphereGeometry(30, 32, 16), M.hill, TEMPLE.x + 4, -10, TEMPLE.z - 4, world, { cast: false }); hill.scale.set(1, 0.85, 0.8);
-const temple = new THREE.Group(); temple.position.set(TEMPLE.x, 15.2, TEMPLE.z); temple.rotation.y = rx(-80); world.add(temple);
-add(tbox(14, 1.6, 22, 2), M.marbleTop, 0, 0.8, 0, temple);
-for (let i = 0; i < 4; i++) add(tbox(14 - i * 0.0, 0.3, 1.4, 2), M.marbleTop, 0, 0.15 + i * 0.3, 11.3 + i * -0.0 + 0.7 - i * 0.35, temple);
-const cella = add(tbox(9, 7, 13, 2), M.plaster, 0, 5.1, -3.5, temple);
-const columns = [];
-const colGeo = new THREE.CylinderGeometry(0.55, 0.62, 7, 14); colGeo.translate(0, 3.5, 0);
-const colPos = [];
-for (let i = 0; i < 6; i++) colPos.push([-5.6 + i * 2.24, 9.5]);
-for (let i = 0; i < 5; i++) { colPos.push([-5.6, 7 - i * 3.6]); colPos.push([5.6, 7 - i * 3.6]); }
-for (const [x, z] of colPos) { const c = add(colGeo, M.marble, x, 1.6, z, temple); c.userData.base = c.position.clone(); columns.push(c); }
-const entab = add(tbox(13, 1.1, 21, 2), M.marbleTop, 0, 9.15, -0.5, temple);
-const pedShape = new THREE.Shape(); pedShape.moveTo(-6.8, 0); pedShape.lineTo(6.8, 0); pedShape.lineTo(0, 2.6); pedShape.closePath();
-const roofG = new THREE.Group(); roofG.position.set(0, 9.7, -0.5); temple.add(roofG);
-const ped = add(new THREE.ExtrudeGeometry(pedShape, { depth: 21.6, bevelEnabled: false }), M.marbleTop, 0, 0, -10.8, roofG);
-for (const s of [-1, 1]) { const rf = add(tbox(7.4, 0.35, 22.2, 2), M.roof, s * 3.35, 1.3, 0, roofG); rf.rotation.z = -s * Math.atan2(2.6, 6.8); }
-entab.userData.base = entab.position.clone(); roofG.userData.base = roofG.position.clone();
-// village houses (near bank) + a few far ones
-const houses = [];
-const house = (x, z, w, d, h, rot, mat = M.plaster) => {
-  const g = new THREE.Group(); g.position.set(x, DECK, z); g.rotation.y = rot; world.add(g);
-  add(tbox(w, h, d, 2), mat, 0, h / 2, 0, g);
-  const rf = add(new THREE.ConeGeometry(Math.hypot(w, d) / 2 + 0.5, 1.8, 4), M.roof, 0, h + 0.9, 0, g); rf.rotation.y = Math.PI / 4; rf.scale.set(w / Math.hypot(w, d) * 1.414, 1, d / Math.hypot(w, d) * 1.414);
-  add(box(0.9, 1.8, 0.1), M.door, 0, 0.9, d / 2 + 0.03, g, { cast: false });
-  for (const s of [-1, 1]) add(box(0.6, 0.7, 0.1), M.window, s * w * 0.3, h * 0.62, d / 2 + 0.03, g, { cast: false });
-  houses.push(g); return g;
+// gate tower pavilion on the wall top
+const tower = new THREE.Group(); tower.position.set(-0.3, WH, 0); world.add(tower);
+add(tbox(4.6, 0.25, 11, 2), MX.wood, 0, 0.12, 0, tower);
+const pillarGeo = new THREE.CylinderGeometry(0.17, 0.19, 3.1, 10); pillarGeo.translate(0, 1.55, 0);
+for (const x of [-1.7, 1.7]) for (const z of [-4.6, -1.5, 1.5, 4.6]) add(pillarGeo, MX.red, x, 0.25, z, tower);
+for (const x of [-1.7, 1.7]) add(tbox(0.32, 0.42, 9.6, 2), MX.redDark, x, 3.4, 0, tower);
+for (const z of [-4.6, 4.6]) add(tbox(3.7, 0.42, 0.32, 2), MX.redDark, 0, 3.4, z, tower);
+add(tbox(5.8, 0.24, 11.6, 2), MX.tileDark, 0, 3.72, 0, tower);
+const hip = add(new THREE.ConeGeometry(1, 1, 4), MX.tiles, 0, 4.85, 0, tower); hip.rotation.y = Math.PI / 4; hip.scale.set(5.9 / 1.414, 2.2, 11.8 / 1.414);
+add(tbox(0.28, 0.32, 5.4, 1), MX.tileDark, 0, 5.85, 0, tower);
+for (const x of [-2.9, 2.9]) for (const z of [-5.8, 5.8]) { const c = add(new THREE.ConeGeometry(0.16, 0.9, 5), MX.tileDark, x * 1.04, 4.0, z * 1.03, tower); c.rotation.z = -Math.sign(x) * 0.7; c.rotation.x = Math.sign(z) * 0.7; }
+for (const z of [-2.6, 2.6]) add(new THREE.SphereGeometry(0.22, 8, 6), MX.tileDark, 0, 6.05, z, tower);
+// flags on the wall top (green Shu)
+const flags = [];
+const mkFlag = (parent, x, y, z, mat, h = 4.2) => {
+  const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g);
+  add(new THREE.CylinderGeometry(0.05, 0.06, h, 6), MX.wood, 0, h / 2, 0, g);
+  const cl = add(new THREE.PlaneGeometry(1.0, 1.9, 6, 6), mat, 0, h - 1.05, 0.52, g); cl.rotation.y = Math.PI / 2;
+  cl.userData.cloth = cl.geometry.attributes.position.array.slice(); cl.userData.ph = x * 0.7 + z * 1.3; flags.push(cl); return g;
+};
+for (const z of [-7, 7, -20, 20, -34, 34]) mkFlag(world, WT / 2 - 0.9, WH, z, MX.flagShu);
+// zither on a low table at the front of the tower (Zhuge sits behind it)
+const zitherG = new THREE.Group(); zitherG.position.set(2.0, WH, 0); world.add(zitherG);
+add(tbox(0.55, 0.42, 1.55, 1), MX.lacquer, 0, 0.21, 0, zitherG);
+add(new THREE.BoxGeometry(0.34, 0.07, 1.4), [MX.lacquer, MX.lacquer, MX.zither, MX.lacquer, MX.lacquer, MX.lacquer], 0, 0.46, 0, zitherG);
+const incense = add(new THREE.CylinderGeometry(0.1, 0.13, 0.22, 8), toon({ color: '#b08a4a' }), 0.05, 0.53, -0.62, zitherG);
+// town houses: white plaster, grey hip roofs with flared eaves
+const house = (x, z, w, d, h, rot = 0) => {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rot; world.add(g);
+  add(tbox(w, h, d, 2), MX.plaster, 0, h / 2, 0, g);
+  add(tbox(w + 1.4, 0.2, d + 1.4, 2), MX.tileDark, 0, h + 0.1, 0, g);
+  const r = add(new THREE.ConeGeometry(1, 1, 4), MX.tiles, 0, h + 0.95, 0, g); r.rotation.y = Math.PI / 4; r.scale.set((w + 1.3) / 1.414, 1.7, (d + 1.3) / 1.414);
+  add(box(1.0, 2.0, 0.1), MX.redDark, 0, 1.0, d / 2 + 0.03, g, { cast: false });
+  for (const sx of [-1, 1]) add(box(0.7, 0.7, 0.1), MX.lacquer, sx * w * 0.3, h * 0.6, d / 2 + 0.03, g, { cast: false });
+  return g;
 };
 const rh = P.rng(12);
-[[-34, -12], [-41, 9], [-48, -14], [-56, 6], [-63, -20], [-70, 0], [-52, 24], [-75, 18]].forEach(([x, z], i) =>
-  house(x, z, 4 + rh() * 3, 4 + rh() * 2.5, 3.2 + rh() * 2.4, rh() * 0.6 - 0.3 + (z > 0 ? Math.PI : 0), i % 2 ? M.plaster : M.plaster2));
-[[34, 14], [42, 24], [36, -30], [48, 32], [30, 30]].forEach(([x, z], i) => house(x, z, 4 + rh() * 3, 4 + rh() * 2, 3 + rh() * 2, rh() * 3, i % 2 ? M.plaster2 : M.plaster));
-// trees
-const cypress = (x, z, h = 7, y = DECK) => { const g = new THREE.Group(); g.position.set(x, y, z); world.add(g); add(new THREE.CylinderGeometry(0.15, 0.2, 1, 6), M.trunk, 0, 0.5, 0, g); const c = add(new THREE.SphereGeometry(1, 10, 10), M.cypress, 0, 0.9 + h / 2, 0, g); c.scale.set(0.95, h / 2, 0.95); return g; };
-const pine = (x, z, h = 6, y = DECK) => { const g = new THREE.Group(); g.position.set(x, y, z); world.add(g); const t = add(new THREE.CylinderGeometry(0.2, 0.3, h, 6), M.trunk, 0, h / 2, 0, g); t.rotation.z = 0.08; const c = add(new THREE.SphereGeometry(1, 12, 8), M.pine, 0.3, h + 0.3, 0, g); c.scale.set(3.2, 1.1, 3.2); return g; };
+[[-24, -16, 0], [-34, -16, 0], [-44, -14, 0], [-26, 17, Math.PI], [-37, 18, Math.PI], [-48, 16, Math.PI], [-52, 0, Math.PI / 2], [-56, -30, 0], [-40, -36, 0], [-24, -40, 0], [-30, 36, Math.PI], [-48, 40, Math.PI]]
+  .forEach(([x, z, r]) => house(x, z, 6 + rh() * 3, 5 + rh() * 2, 3.2 + rh() * 1.4, r));
+// courtyard props: cook's cauldron on a fire, clerk's desk with scrolls
+const cauldron = new THREE.Group(); cauldron.position.set(-16.4, 0, -5.9); world.add(cauldron);
+add(new THREE.CylinderGeometry(0.75, 0.55, 0.9, 14), MX.iron, 0, 0.75, 0, cauldron);
+add(new THREE.TorusGeometry(0.75, 0.07, 6, 16), MX.iron, 0, 1.2, 0, cauldron).rotation.x = Math.PI / 2;
+for (let i = 0; i < 5; i++) { const a = i * 1.26; add(new THREE.ConeGeometry(0.2, 0.55, 5), MX.fire, Math.cos(a) * 0.35, 0.28, Math.sin(a) * 0.35, cauldron, { cast: false }); }
+const desk = new THREE.Group(); desk.position.set(-15.3, 0, -0.9); desk.rotation.y = Math.PI / 2; world.add(desk);
+add(tbox(1.6, 0.75, 0.8, 1), MX.wood, 0, 0.375, 0, desk);
+for (let i = 0; i < 4; i++) { const sc = add(new THREE.CylinderGeometry(0.07, 0.07, 0.55, 8), toon({ color: i % 2 ? '#efe2bc' : '#e2cf98' }), -0.5 + i * 0.25, 0.82, 0, desk); sc.rotation.x = Math.PI / 2; }
+// map table (in a side yard of the town)
+const MAPAT = new THREE.Vector3(-20, 0, -30);
+add(tbox(2.3, 0.85, 2.3, 1), MX.wood, MAPAT.x, 0.425, MAPAT.z, world);
+const mapCanvas = document.createElement('canvas'); mapCanvas.width = mapCanvas.height = 1024;
+const mapTex = new THREE.CanvasTexture(mapCanvas); mapTex.colorSpace = THREE.SRGBColorSpace; mapTex.anisotropy = 8;
+const mapMesh = add(new THREE.PlaneGeometry(2.0, 2.0), toon({ map: mapTex }), MAPAT.x, 0.862, MAPAT.z, world, { cast: false }); mapMesh.rotation.x = -Math.PI / 2;
+let mapKey = '';
+for (const [dx, dz] of [[1.25, 0.6], [-1.25, -0.4]]) add(new THREE.CylinderGeometry(0.12, 0.12, 1.9, 8), toon({ color: '#e2cf98' }), MAPAT.x + dx, 0.95, MAPAT.z + dz, world).rotation.x = Math.PI / 2;
+// Ma Su's mountain pass (far to the north-east)
+const PASS = new THREE.Vector3(170, 0, -230);
+add(new THREE.CylinderGeometry(5, 36, 26, 9), MX.rock, PASS.x, 13, PASS.z, world);
+add(new THREE.CylinderGeometry(5.6, 5.0, 0.6, 9), MX.rockTop, PASS.x, 26.2, PASS.z, world);
+for (const [dx, dz, r, h] of [[-40, -10, 26, 34], [38, -20, 30, 40], [-10, -45, 34, 46]]) add(new THREE.ConeGeometry(r, h, 8), MX.rock, PASS.x + dx, h / 2, PASS.z + dz, world);
+const passFlags = { shu: mkFlag(world, PASS.x - 1.6, 26.4, PASS.z + 0.8, MX.flagShu, 4.6), wei: mkFlag(world, PASS.x + 1.6, 26.4, PASS.z - 0.6, MX.flagWei, 4.6) };
+// ---- the Wei army: merged low-poly soldiers in blocks, with red banners ----
+const mergeGeos = (parts) => { // parts: [geo, matrix]
+  const pos = [], nor = [];
+  for (const [g0, m] of parts) { const g = g0.index ? g0.toNonIndexed() : g0.clone(); g.applyMatrix4(m); pos.push(...g.attributes.position.array); nor.push(...g.attributes.normal.array); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); return g;
+};
+const SOL = { body: new THREE.CylinderGeometry(0.22, 0.3, 1.25, 6), head: new THREE.SphereGeometry(0.17, 6, 4), helm: new THREE.ConeGeometry(0.22, 0.32, 6), spear: new THREE.CylinderGeometry(0.025, 0.025, 2.9, 4), tip: new THREE.ConeGeometry(0.07, 0.25, 4) };
+const mtx = (x, y, z) => new THREE.Matrix4().makeTranslation(x, y, z);
+const blockGeos = (rows, cols, sp, seed) => {
+  const r = P.rng(seed), A = [], Hd = [], S = [], Tp = [];
+  for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) {
+    const x = (i - (rows - 1) / 2) * sp + (r() - 0.5) * 0.2, z = (j - (cols - 1) / 2) * sp + (r() - 0.5) * 0.2;
+    A.push([SOL.body, mtx(x, 0.63, z)], [SOL.helm, mtx(x, 1.6, z)]); Hd.push([SOL.head, mtx(x, 1.4, z)]);
+    S.push([SOL.spear, mtx(x, 1.45, z + 0.32)]); Tp.push([SOL.tip, mtx(x, 3.0, z + 0.32)]);
+  }
+  return [mergeGeos(A), mergeGeos(Hd), mergeGeos(S), mergeGeos(Tp)];
+};
+const army = new THREE.Group(); world.add(army);
+const blocks = [];
+{ const tmpl = blockGeos(8, 12, 1.25, 5);
+  for (let ix = 0; ix < 7; ix++) for (let iz = 0; iz < 5; iz++) {
+    const g = new THREE.Group(); g.position.set(34 + ix * 15, 0, (iz - 2) * 19 + (ix % 2) * 3); army.add(g);
+    add(tmpl[0], MX.armor, 0, 0, 0, g); add(tmpl[1], MX.skin, 0, 0, 0, g, { cast: false }); add(tmpl[2], MX.spear, 0, 0, 0, g, { cast: false }); add(tmpl[3], MX.tassel, 0, 0, 0, g, { cast: false });
+    for (const dz of [-5, 5]) mkFlag(g, -5.5, 0, dz, MX.flagWei, 5.2);
+    g.userData.base = g.position.clone(); g.userData.ph = ix * 1.3 + iz * 0.7; blocks.push(g);
+  } }
+// trees: poplars and willows on the plain and in town
+const poplar = (x, z, h = 9) => { const g = new THREE.Group(); g.position.set(x, 0, z); world.add(g); add(new THREE.CylinderGeometry(0.16, 0.22, 1.4, 6), MX.trunk, 0, 0.7, 0, g); const c = add(new THREE.SphereGeometry(1, 10, 10), MX.poplar, 0, 1.2 + h / 2, 0, g); c.scale.set(1.1, h / 2, 1.1); return g; };
+const willow = (x, z) => { const g = new THREE.Group(); g.position.set(x, 0, z); world.add(g); add(new THREE.CylinderGeometry(0.25, 0.35, 3.4, 6), MX.trunk, 0, 1.7, 0, g); const c = add(new THREE.SphereGeometry(1, 12, 8), MX.willow, 0, 4.2, 0, g); c.scale.set(3.0, 2.2, 3.0); return g; };
 const rt = P.rng(44);
-for (let i = 0; i < 34; i++) { const x = -(24 + rt() * 70), z = (rt() - 0.5) * 120; if (Math.abs(z) < 5 && x > -60) continue; (i % 3 ? cypress : pine)(x, z, 5 + rt() * 4); }
-for (let i = 0; i < 30; i++) { const x = 24 + rt() * 70, z = (rt() - 0.5) * 140; if (Math.abs(z) < 5 && x < 60) continue; if (Math.hypot(x - TEMPLE.x, z - TEMPLE.z) < 22) continue; (i % 3 ? cypress : pine)(x, z, 5 + rt() * 4); }
-for (let i = 0; i < 8; i++) { const a = rt() * 6.28; cypress(TEMPLE.x + Math.cos(a) * 16, TEMPLE.z + Math.sin(a) * 14, 6 + rt() * 3, 13); }
-for (let i = 0; i < 26; i++) { const s = i % 2 ? 1 : -1; if (s < 0) { rt(); rt(); rt(); continue; } add(new THREE.SphereGeometry(0.9 + rt() * 0.8, 10, 8), M.bush, s * (21.5 + rt() * 12), DECK + 0.3, (rt() - 0.5) * 60, world).scale.y = 0.7; }
-// rolling hills + mountains (far)
-for (let i = 0; i < 16; i++) { const a = rt() * Math.PI * 2, d = 160 + rt() * 160; const h = add(new THREE.SphereGeometry(40 + rt() * 40, 20, 10), i % 2 ? M.hill : M.hillFar, Math.cos(a) * d, -12, Math.sin(a) * d, world, { cast: false }); h.scale.y = 0.5 + rt() * 0.3; }
-for (let i = 0; i < 14; i++) { const a = rt() * Math.PI * 2, d = 520 + rt() * 200, hh = 120 + rt() * 120, r_ = 110 + rt() * 70; const g = new THREE.Group(); g.position.set(Math.cos(a) * d, -5, Math.sin(a) * d); world.add(g); add(new THREE.ConeGeometry(r_, hh, 7), M.mount, 0, hh / 2, 0, g, { cast: false }); add(new THREE.ConeGeometry(r_ * 0.3, hh * 0.3, 7), M.snow, 0, hh * 0.86, 0, g, { cast: false }); }
-
-// clouds: painted billboards far away (no fog, no ink)
+for (let i = 0; i < 46; i++) { const x = 8 + rt() * 230, z = (rt() < 0.5 ? -1 : 1) * (70 + rt() * 160); poplar(x, z, 7 + rt() * 5); }
+for (let i = 0; i < 10; i++) { const x = 8 + rt() * 20, z = (rt() < 0.5 ? -1 : 1) * (10 + rt() * 40); (i % 2 ? willow : poplar)(x, z, 8); }
+for (const [x, z] of [[-20, -7], [-42, 6], [-30, -28], [-12, -24]]) willow(x, z);
+// hills + mountains + clouds
+for (let i = 0; i < 18; i++) { const a = rt() * Math.PI * 2, d = 260 + rt() * 200; const h = add(new THREE.SphereGeometry(50 + rt() * 50, 20, 10), i % 2 ? MX.hill : MX.hillFar, Math.cos(a) * d, -14, Math.sin(a) * d, world, { cast: false }); h.scale.y = 0.45 + rt() * 0.3; }
+for (let i = 0; i < 16; i++) { const a = rt() * Math.PI * 2, d = 560 + rt() * 220, hh = 140 + rt() * 140, r_ = 110 + rt() * 80; const g = new THREE.Group(); g.position.set(Math.cos(a) * d, -5, Math.sin(a) * d); world.add(g); add(new THREE.ConeGeometry(r_, hh, 7), MX.mount, 0, hh / 2, 0, g, { cast: false }); add(new THREE.ConeGeometry(r_ * 0.3, hh * 0.3, 7), MX.snow, 0, hh * 0.86, 0, g, { cast: false }); }
 const clouds = [];
 { const r = P.rng(90);
   for (let i = 0; i < 14; i++) {
@@ -230,19 +228,6 @@ const clouds = [];
     const a = r() * Math.PI * 2, d = 650 + r() * 250; m.position.set(Math.cos(a) * d, 120 + r() * 160, Math.sin(a) * d); m.scale.setScalar(160 + r() * 140);
     m.userData.ndSkip = true; m.renderOrder = -1; scene.add(m); clouds.push(m);
   } }
-
-// ---------- helmet prop (3D) ----------
-const helmet = new THREE.Group(); scene.add(helmet); helmet.visible = false;
-{
-  const inGeo = new THREE.SphereGeometry(0.98, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2);
-  const uv = inGeo.attributes.uv, pos = inGeo.attributes.position;
-  for (let i = 0; i < uv.count; i++) uv.setXY(i, 0.5 - pos.getX(i) / 2.1, 0.5 - pos.getZ(i) / 2.1);
-  add(inGeo, M.helmIn, 0, 0, 0, helmet);
-  add(new THREE.SphereGeometry(1.0, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2), M.helmOut, 0, 0, 0, helmet);
-  const band = add(new THREE.TorusGeometry(1.0, 0.07, 8, 48), toon({ color: '#a88a4a' }), 0, 0.02, 0, helmet); band.rotation.x = Math.PI / 2;
-  const crest = add(new THREE.CylinderGeometry(1.3, 1.3, 0.22, 32, 1, false, 0, Math.PI), toon({ color: '#8d4b3f' }), 0, 0.95, 0, helmet);
-  crest.rotation.z = Math.PI / 2; crest.rotation.y = Math.PI / 2; crest.scale.set(1, 1, 0.6);
-}
 
 // ---------- cards ----------
 const CW = 1200, CH = 2000, CM = 2.25; // canvas px, card height in metres (design 600x1000 -> 2.25 m)
@@ -325,7 +310,6 @@ function applyLight(L, f) {
   scene.fog.color.set(L.fog); scene.fog.near = L.fogNear; scene.fog.far = L.fogFar;
   skyU.top.value.set(L.skyTop); skyU.hor.value.set(L.skyHor); skyU.sunCol.value.set(L.sunDisc || '#000'); skyU.sunSize.value = L.sunSize || 0;
   inkU.sat.value = L.sat; inkU.gain.value.set(L.gain || '#ffffff'); inkU.lift.value.set(L.lift || '#000000');
-  waterU.deep.value.set(L.waterDeep); waterU.shal.value.set(L.waterShal); waterU.glint.value.set(L.glint);
 }
 function placeSun(L, focus) {
   // sun direction from azimuth/elevation in world space
@@ -336,32 +320,29 @@ function placeSun(L, focus) {
 }
 
 function worldState(S, f) {
-  // temple collapse
-  const k = S.collapse; // 0..1+
-  columns.forEach((c, i) => {
-    const ord = (i * 7) % columns.length, t = Math.min(1, Math.max(0, (k * 1.6 - ord / columns.length * 0.6)));
-    const e = t * t; c.rotation.set(0, 0, 0); c.position.copy(c.userData.base);
-    if (t > 0) { const dir = (i % 3) - 1 || 1; c.rotation.z = dir * e * 1.45; c.rotation.x = ((i % 2) * 2 - 1) * e * 0.35; c.position.y -= e * 0.4; }
-  });
-  const kr = Math.min(1, Math.max(0, k * 1.4 - 0.15)), er = kr * kr;
-  entab.position.copy(entab.userData.base); entab.position.y -= er * 7.6; entab.rotation.set(er * 0.1, 0, er * 0.22);
-  roofG.position.copy(roofG.userData.base); roofG.position.y -= er * 8.2; roofG.rotation.set(-er * 0.12, 0, -er * 0.38);
-  cella.scale.y = 1 - er * 0.45; cella.position.y = 5.1 - er * 1.6;
-  // banner: waves, falls in the collapse, gone later
-  bannerG.visible = S.banner !== 'gone';
-  bannerG.rotation.x = S.banner === 'fall' ? -Math.min(1.45, Math.pow(Math.max(0, S.bannerFall), 2) * 1.45) : 0;
-  const pa = bannerCloth.geometry.attributes.position, base = bannerCloth.userData.cloth;
-  for (let i = 0; i < pa.count; i++) { const x = base[i * 3], y = base[i * 3 + 1]; const amp = (1.4 - (y + 1.4)) * 0; pa.setZ(i, Math.sin(f * 0.18 + x * 3.2 + y * 1.3) * 0.08 * (x + 0.7)); }
-  pa.needsUpdate = true;
-  // age: moss / ivy on the gate and the hut
-  for (const m of gateStone) m.material = S.old ? M.stoneMoss : M.stone;
-  eagle.visible = !S.old;
-  // broken brace in shot 8
-  const br = braces[2]; br.userData.p0 = br.userData.p0 || br.position.clone(); br.userData.r0 = br.userData.r0 ?? br.rotation.z;
-  br.position.copy(br.userData.p0); br.rotation.set(0, 0, br.userData.r0);
-  if (S.braceFall > 0) { const t = S.braceFall; br.position.y -= 0.5 * 9.8 * t * t * 0.55; br.position.x += t * 0.6; br.rotation.z = br.userData.r0 + t * 1.3; br.rotation.x = t * 0.5; br.visible = br.position.y > -0.4; }
-  else br.visible = true;
-  waterU.t.value = f / 30;
+  // gate doors: 0 closed .. 1 wide open (swing inward)
+  for (const g of doors) g.rotation.y = g.userData.s * (S.doors || 0) * 1.75;
+  // army: advance offset (m along +x from the rest line), visibility, marching bob
+  army.visible = S.army !== false;
+  const adv = S.armyX || 0, marching = !!S.marching;
+  for (const b of blocks) {
+    b.position.copy(b.userData.base); b.position.x += adv;
+    b.position.y = marching ? Math.abs(Math.sin(f * 0.32 + b.userData.ph)) * 0.08 : 0;
+    b.rotation.y = S.armyTurn ? Math.PI * S.armyTurn : 0;
+  }
+  // flags wave
+  for (const cl of flags) {
+    const pa = cl.geometry.attributes.position, base = cl.userData.cloth;
+    for (let i = 0; i < pa.count; i++) { const x = base[i * 3], y = base[i * 3 + 1]; pa.setZ(i, Math.sin(f * 0.2 + cl.userData.ph + x * 3.4 + y * 1.1) * 0.11 * (x + 0.5)); }
+    pa.needsUpdate = true;
+  }
+  // the lost pass: green flag drops, red flag springs up
+  passFlags.shu.rotation.x = -Math.min(1.5, S.shuDrop || 0);
+  passFlags.wei.scale.y = Math.max(0.001, S.weiUp ?? 1); passFlags.wei.visible = (S.weiUp ?? 1) > 0.01;
+  // map
+  const mk = JSON.stringify(S.map || {});
+  if (mk !== mapKey) { mapKey = mk; P.warMap(mapCanvas, S.map || {}); mapTex.needsUpdate = true; }
+  incense.rotation.y = f * 0.01; zitherG.visible = !!S.zither;
 }
 
 function drawActors(list, cam) {
@@ -375,14 +356,9 @@ function drawActors(list, cam) {
     c.mat.color.set(a.tint || '#ffffff'); c.mat.opacity = a.alpha ?? 1;
     c.mesh.castShadow = a.shadow !== false;
     c.mesh.renderOrder = a.order || 2;
-    if (a.blob !== false && a.y < DECK + 0.5) { c.blob.visible = true; c.blob.position.set(a.x, (a.ground ?? DECK) + 0.02, a.z); c.blob.scale.set(0.95 * s, 0.6 * s, 1); }
+    if (a.blob !== false && a.y - (a.ground ?? DECK) < 0.5) { c.blob.visible = true; c.blob.position.set(a.x, (a.ground ?? DECK) + 0.02, a.z); c.blob.scale.set(0.95 * s, 0.6 * s, 1); }
   });
 }
-
-const helmetState = (h) => {
-  helmet.visible = !!h; if (!h) return;
-  helmet.position.set(h.x, h.y, h.z); helmet.rotation.set(h.rx || 0, h.ry || 0, h.rz || 0); helmet.scale.setScalar(h.s || 0.17);
-};
 
 const swapForNd = (on) => {
   scene.traverse((o) => {
@@ -406,7 +382,6 @@ window.renderFrame = (f) => {
   const W_ = worldAt(f); worldState(W_, f);
   placeSun(L, new THREE.Vector3(...(C.shadowAt || C.look)));
   drawActors([...actorsAt(f, T), ...fxAt(f, T)], camera);
-  helmetState(W_.helmet);
   sky.position.copy(camera.position);
   for (const c of clouds) c.quaternion.copy(camera.quaternion);
   // pass A: colour

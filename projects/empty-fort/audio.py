@@ -52,12 +52,20 @@ midi = lambda m: 440 * 2 ** ((m - 69) / 12)
 
 # ---------------- music ----------------
 music = np.zeros(N, np.float32)
-BPM = 104; beat = 60 / BPM
-prog = [(57, [57, 60, 64]), (53, [53, 57, 60]), (55, [55, 59, 62]), (52, [52, 56, 59])]  # Am F G E
+BPM = 96; beat = 60 / BPM
+PENTA = [62, 64, 66, 69, 71, 74, 76, 78, 81]          # D major pentatonic
+ROOTS = [50, 47, 43, 45]                             # D  Bm  G  A
 def pluck(f, dur=0.35, bright=0.5):
     n = int(dur * SR); t = np.arange(n) / SR
     s = sum((bright ** k) * np.sin(2 * np.pi * f * (k + 1) * t) / (k + 1) for k in range(6))
     return (s * env(n, 0.003, dur * 0.35)).astype(np.float32)
+def zither(f, dur=0.9, bend=0.0):
+    """plucked guqin-like tone: bright attack, slow decay, optional little upward slide"""
+    n = int(dur * SR); t = np.arange(n) / SR
+    fr = f * (1 + bend * (1 - np.exp(-t * 18)))
+    ph = 2 * np.pi * np.cumsum(fr) / SR
+    s = sum((0.62 ** k) * np.sin((k + 1) * ph) / (k + 1) ** 0.8 for k in range(7))
+    return (s * np.exp(-t * 3.2) * np.minimum(1, t / 0.002)).astype(np.float32)
 def brass(fs, dur):
     n = int(dur * SR); t = np.arange(n) / SR; s = np.zeros(n)
     for f in fs:
@@ -65,37 +73,49 @@ def brass(fs, dur):
         s += sum(np.sin((k + 1) * ph) / (k + 1) ** 1.3 for k in range(8))
     a = np.minimum(1, t / 0.08) * np.minimum(1, (dur - t) / 0.15).clip(0)
     return lp_fast((s * a).astype(np.float32), 1800) / len(fs)
+def pad(fs, dur):
+    n = int(dur * SR); t = np.arange(n) / SR
+    s = sum(np.sin(2 * np.pi * f * t) + 0.3 * np.sin(2 * np.pi * 2 * f * t) for f in fs) / len(fs)
+    a = np.minimum(1, t / 0.6) * np.minimum(1, (dur - t) / 0.6).clip(0)
+    return (s * a).astype(np.float32)
 def drum(kind):
-    if kind == "kick":
-        n = int(0.35 * SR); t = np.arange(n) / SR; f = 50 + 90 * np.exp(-t * 30)
-        return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 9)).astype(np.float32)
-    n = int(0.18 * SR); t = np.arange(n) / SR
-    s = rng.standard_normal(n) * np.exp(-t * 28) * 0.6 + np.sin(2 * np.pi * 190 * t) * np.exp(-t * 20) * 0.5
-    return hp_fast(s.astype(np.float32), 300)
+    if kind == "kick":   # big low war drum
+        n = int(0.5 * SR); t = np.arange(n) / SR; f = 45 + 70 * np.exp(-t * 22)
+        return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 7)).astype(np.float32)
+    n = int(0.16 * SR); t = np.arange(n) / SR   # small rim/wood block
+    s = np.sin(2 * np.pi * 820 * t) * np.exp(-t * 60) + rng.standard_normal(n) * np.exp(-t * 80) * 0.3
+    return s.astype(np.float32)
 
-MUSIC_END = 14.15  # music stops on "The bridge is not safe"
-bar = 0; tt = 0.0
-while tt < MUSIC_END:
-    root, ch = prog[bar % 4]
-    place(music, brass([midi(m) for m in ch], beat * 4 * 0.98), tt, 0.10)
+T_TENSE, T_BACK = 48.85, 52.45   # music drops out on "An open gate means a trap" .. returns on "So he turns his army around"
+DRUMS = [(14.0, 22.0), (44.4, 48.85)]  # war drums under the army and the ride-up
+bar = 0; tt = 0.0; mel = rng.integers(0, 5, 64)
+while tt < T_TENSE:
+    root = ROOTS[bar % 4]
+    place(music, pad([midi(root + 12), midi(root + 19)], beat * 4), tt, 0.05)
     for b in range(4):
         tb = tt + b * beat
-        if tb >= MUSIC_END: break
-        place(music, drum("kick" if b % 2 == 0 else "snare"), tb, 0.55 if b % 2 == 0 else 0.32)
-        place(music, pluck(midi(root - 12), 0.4, 0.4), tb, 0.35)
-        place(music, pluck(midi(ch[(b + bar) % 3] + 12), 0.22, 0.6), tb + beat / 2, 0.13)
-    if bar % 2 == 1:  # little fanfare figure
-        for k, m in enumerate([ch[0] + 12, ch[1] + 12, ch[2] + 12]):
-            place(music, brass([midi(m)], beat * 0.45), tt + 2 * beat + k * beat * 0.5, 0.07)
+        if tb >= T_TENSE: break
+        place(music, pluck(midi(root - 12 + 12), 0.45, 0.35), tb, 0.30)
+        if any(a <= tb < z for a, z in DRUMS): place(music, drum("kick"), tb, 0.7 if b % 2 == 0 else 0.45)
+        else: place(music, drum("kick"), tb, 0.30) if b == 0 else place(music, drum("wood"), tb, 0.12)
+        n1 = PENTA[(mel[(bar * 4 + b) % 64] + bar) % 7]
+        place(music, zither(midi(n1), 0.7), tb + beat / 2, 0.16)
     bar += 1; tt += beat * 4
-# fade the bed at the stop
-i0 = int((MUSIC_END - 0.08) * SR); music[i0:] *= np.linspace(1, 0, N - i0) ** 8
-# tension drone from the sting to the end
-dn = int((DUR - MUSIC_END) * SR); td = np.arange(dn) / SR
-drone = (np.sin(2 * np.pi * 55 * td) + 0.5 * np.sin(2 * np.pi * 82.4 * td) + 0.3 * np.sin(2 * np.pi * 110.3 * td)) * np.minimum(1, td / 1.2)
-drone = lp_fast(drone.astype(np.float32), 600)
-place(music, drone, MUSIC_END, 0.09)
-
+i0 = int((T_TENSE - 0.1) * SR); i1 = int(T_BACK * SR); music[i0:i1] *= np.linspace(1, 0, i1 - i0) ** 10
+# tension: low drone + heartbeat drums
+dn = int((T_BACK - T_TENSE) * SR); td = np.arange(dn) / SR
+drone = lp_fast(((np.sin(2 * np.pi * 55 * td) + 0.5 * np.sin(2 * np.pi * 82.4 * td)) * np.minimum(1, td / 0.6) * np.minimum(1, (td[-1] - td) / 0.3).clip(0)).astype(np.float32), 600)
+place(music, drone, T_TENSE, 0.12)
+for k in range(5): place(music, drum("kick"), T_TENSE + 0.35 + k * 0.7, 0.35); place(music, drum("kick"), T_TENSE + 0.55 + k * 0.7, 0.2)
+# release: solo zither melody over a warm pad to the end, last chord on "himself"
+phrase = [69, 71, 74, 76, 74, 71, 69, 66, 69, 74, 78, 76, 74, 71, 74, 69]
+tt = T_BACK; k = 0
+while tt < DUR - 1.6:
+    root = ROOTS[(k // 4) % 4]
+    if k % 4 == 0: place(music, pad([midi(root + 12), midi(root + 16 if root in (50, 43) else root + 15), midi(root + 19)], beat * 4), tt, 0.06)
+    place(music, zither(midi(phrase[k % 16]), 1.1, 0.02 if k % 4 == 3 else 0), tt, 0.2)
+    if k % 2 == 0: place(music, pluck(midi(root), 0.6, 0.3), tt, 0.25)
+    k += 1; tt += beat
 # ---------------- sfx ----------------
 sfx = np.zeros(N, np.float32)
 def noise(d): return rng.standard_normal(int(d * SR)).astype(np.float32)
@@ -162,25 +182,57 @@ def water(d):
     return (lp_fast(noise(d), 900) * 0.5 + hp_fast(lp_fast(noise(d), 3000), 1200) * 0.15 * (0.6 + 0.4 * np.sin(2 * np.pi * 0.4 * t))).astype(np.float32)
 
 F = lambda f: f / 30
-place(sfx, whoosh(0.6), F(18), 0.5)            # hook camera pull-back
-place(sfx, leaves(2.2), F(62), 0.35)           # the years blow past
-place(sfx, thunk(85, 0.35), F(120), 1.0)       # spear stamp on "post"
-place(sfx, rumble(2.2), F(176), 0.9)           # empire collapses
-place(sfx, crash(1.4), F(186), 0.7)
-place(sfx, whoosh(0.5), F(196), 0.35)          # rack to the soldier
-place(sfx, cuckoo(), F(255), 0.35)             # "crazy"
-place(sfx, whoosh(0.4), F(276), 0.6)           # time jump flash
-for k in range(2): place(sfx, snore(1.15), F(286) + k * 1.45, 0.45)
-place(sfx, scrape(0.9), F(316), 0.6)           # helmet lifted
-place(sfx, ting(), F(392), 0.55)               # the carving glints
-place(sfx, sting(), 14.18, 0.85)               # "The bridge is not safe."
-place(sfx, creak(0.55, 120), F(464), 0.9); place(sfx, creak(0.5, 160), F(473), 0.7)
-place(sfx, whoosh(0.7), F(484), 0.5)           # crane under the deck
-place(sfx, water(DUR - F(484)), F(484), 0.35)
-place(sfx, creak(0.8, 90), F(536), 1.0)
-place(sfx, snap(), F(548), 0.9)                # brace breaks on "rotting"
-place(sfx, splash(1.0), F(580), 0.9)
+def boing():
+    n = int(0.5 * SR); t = np.arange(n) / SR; f = 520 * np.exp(-t * 3) + 120
+    return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 5)).astype(np.float32)
+def shimmer(d=1.6):
+    n = int(d * SR); t = np.arange(n) / SR; s = np.zeros(n)
+    for k, f0 in enumerate([880, 1320, 1760, 2200]): s += np.sin(2 * np.pi * np.cumsum(f0 * (1 + 0.6 * t / d)) / SR) * (0.5 + 0.5 * np.sin(2 * np.pi * (6 + k) * t))
+    return (s * (t / d) ** 2 * 0.25).astype(np.float32)
+def rustle(d=0.6):
+    x = hp_fast(lp_fast(noise(d), 5000), 1500); n = len(x); t = np.arange(n) / SR
+    return (x * (0.5 + 0.5 * np.abs(np.sin(2 * np.pi * 7 * t))) * np.minimum(1, (d - t) / 0.2)).astype(np.float32)
+def clang():
+    n = int(0.9 * SR); t = np.arange(n) / SR
+    return (sum(np.sin(2 * np.pi * f * t) * np.exp(-t * dk) for f, dk in [(620, 5), (1490, 7), (2310, 9)]) * 0.4).astype(np.float32)
+def whinny(d=1.0):
+    n = int(d * SR); t = np.arange(n) / SR; f = 700 + 300 * np.sin(2 * np.pi * 11 * t) * np.exp(-t * 2) - 300 * t / d
+    s = np.sin(2 * np.pi * np.cumsum(f) / SR) + 0.4 * np.sin(4 * np.pi * np.cumsum(f) / SR)
+    return lp_fast((s * env(n, 0.04, 0.4)).astype(np.float32), 2500) * 0.6
+def hoof():
+    n = int(0.12 * SR); t = np.arange(n) / SR
+    return (np.sin(2 * np.pi * 180 * t) * np.exp(-t * 60) + lp_fast(noise(0.12), 1500) * np.exp(-t * 50) * 0.5).astype(np.float32)
+def swish(d=0.35): x = hp_fast(lp_fast(noise(d), 4000), 600); t = np.arange(len(x)) / SR; return (x * np.sin(np.pi * t / d) ** 2 * 0.6).astype(np.float32)
+def pop(): n = int(0.12 * SR); t = np.arange(n) / SR; return (np.sin(2 * np.pi * np.cumsum(300 + 900 * t / 0.12) / SR) * np.exp(-t * 30)).astype(np.float32)
 
+place(sfx, creak(0.9, 110), F(42), 0.9)        # the gate swings open on "wide-open gate"
+place(sfx, whoosh(0.6), F(70), 0.45)           # push through the gate
+place(sfx, whoosh(0.4), F(93), 0.5)            # flash cut to the map
+place(sfx, rustle(0.7), F(98), 0.5)            # map unrolled
+place(sfx, thunk(70, 0.3), F(116), 0.6)        # "228 AD"
+for k, f0 in enumerate([180, 190, 200]): place(sfx, thunk(90 + k * 15, 0.25), F(f0), 0.7)  # three kingdoms land
+place(sfx, ting(), F(233), 0.4)                # "Zhuge Liang"
+place(sfx, whoosh(0.5), F(404), 0.5)           # Shu flag drops
+place(sfx, boing(), F(418), 0.6)               # Wei flag springs up
+place(sfx, rumble(5.5), F(446), 0.5)           # 150,000 marching
+place(sfx, brass([midi(38), midi(45)], 1.1), F(727), 0.35)  # "Sima Yi"
+place(sfx, clang(), F(866), 0.45)              # cook's ladle on "cooks"
+place(sfx, rustle(0.5), F(881), 0.5)           # clerk's scrolls on "clerks"
+place(sfx, whinny(1.1), F(912), 0.5)           # nervous horse
+place(sfx, ting(), F(955), 0.25); place(sfx, ting(), F(997), 0.25)  # can't fight / can't run
+place(sfx, shimmer(1.7), F(1040), 0.6)         # the idea is coming
+place(sfx, creak(1.0, 90), F(1114), 1.0)       # gates thrown open
+for k in range(6): place(sfx, swish(0.3), F(1152 + k * 10), 0.35)  # sweeping
+place(sfx, whoosh(0.8), F(1226), 0.5)          # crane up the gate
+place(sfx, ting(), F(1300), 0.7)               # EUREKA sparkle on the zither
+place(sfx, shimmer(1.0), F(1296), 0.35)
+for k in range(10): place(sfx, hoof(), F(1325) + k * 0.23 + (k % 2) * 0.05, 0.5)  # Sima Yi rides up
+for k in range(6): place(sfx, pop(), F([1484, 1489, 1494, 1498, 1503, 1507][k]), 0.4)  # imagined ambushers
+place(sfx, sting(), F(1505), 0.8)              # "trap."
+place(sfx, whoosh(0.6), F(1521), 0.4)          # cut back to Sima Yi
+place(sfx, whoosh(0.9), F(1586), 0.5)          # the army turns around
+place(sfx, rumble(3.5), F(1600), 0.4)          # marching away
+place(sfx, thunk(60, 0.5), F(1811), 0.5)       # soft hit on "himself"
 def write_stem(path, x):
     x = np.asarray(x, np.float32)
     peak = float(np.abs(x).max()) or 1.0

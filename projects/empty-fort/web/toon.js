@@ -2796,6 +2796,11 @@ function drawProp(p, kind, [hx, hy], u, HH, sole, opts) {
     for (let i = -3; i <= 3; i++) p.stroke([[fx, fy], [hx + Math.cos(a + i * 0.12) * L * 1.45, hy + Math.sin(a + i * 0.12) * L * 1.45]], 1.4 * u, "#c9c4b8");
     p.dot(fx, fy, 4 * u, "#3a2614"); return;
   }
+  if (kind === "zither") { // long zither across the lap, seen from the player's side
+    const zy = sole - 1.24 * HH, zx = 300;
+    p.poly([[zx - 170 * u, zy - 6 * u], [zx + 170 * u, zy - 14 * u], [zx + 172 * u, zy + 14 * u], [zx - 168 * u, zy + 22 * u]], "#5a321e", 3 * u);
+    for (let i = 0; i < 5; i++) p.stroke([[zx - 160 * u, zy - 2 * u + i * 4.5 * u], [zx + 160 * u, zy - 10 * u + i * 4.5 * u]], 1.1 * u, "#f5ecd2");
+    return; }
   if (kind === "ladle") { p.band([[hx, hy], [hx + 6 * u, hy - 0.75 * HH]], "#8a5a2a", 4 * u, 1.2 * u, "round"); p.ell(hx + 8 * u, hy - 0.8 * HH, 16 * u, 11 * u, "#9aa0a8", 2 * u); p.dot(hx, hy, 5.5 * u); return; }
   if (kind === "scrolls") { for (let i = 0; i < 3; i++) { const y = hy - 8 * u - i * 13 * u; p.poly(rrect(hx - 34 * u, y - 6 * u, hx + 34 * u, y + 6 * u, 6 * u), i % 2 ? "#efe2bc" : "#e2cf98", 1.8 * u); p.ell(hx - 34 * u, y, 4 * u, 7 * u, "#8a5a2a", 1.4 * u); p.ell(hx + 34 * u, y, 4 * u, 7 * u, "#8a5a2a", 1.4 * u); } return; }
   if (kind === "broom") { const bx = hx + 10 * u, by = sole - 6 * u, tx = hx - 20 * u, ty = hy - 0.5 * HH;
