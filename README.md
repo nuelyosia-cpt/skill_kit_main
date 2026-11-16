@@ -63,12 +63,91 @@ Claude times every word, plans the shots, builds the scenes and characters, writ
 A 60-second video takes about **1-2 hours** to render. To check on it later, open the session and ask **`status?`**.
 
 ### 5. Watch and post
-When it's done, Claude gives you a **Release link**. Open it on your phone and download `<slug>.mp4`.
+When it's done, Claude gives you a **Release link**. Open it on your phone and download `<slug>.mp4`. (See [Where your videos are](#where-your-videos-are) below.)
 
 **What to think about before you post:**
 - Watch with sound. Is the music under the voice, never over it?
+- Read the **captions**. They're burned in and follow the voice word by word, with the spoken word in yellow. Check that they keep up with the voice and don't cover a face.
 - Any frame that looks broken: a face hidden, text mirrored, a frozen moment? Tell Claude which second, e.g. "at 0:23 the inventor is behind the pillar". It fixes the shot and re-renders.
 - Ask Claude for a **YouTube title, description and hashtags**. It can write those, but you upload the video yourself.
+
+---
+
+## Where your videos are
+
+### Made in the cloud (phone or claude.ai/code)
+Every finished video becomes a **GitHub Release**:
+
+**https://github.com/nuelyosia-cpt/skill_kit_main/releases**
+
+| What you see | What it means |
+|---|---|
+| Release name | The video title |
+| Tag `<slug>-r<N>` | The project and the render number. A higher N is a newer render of the same video. |
+| `<slug>.mp4` under **Assets** | **The video.** Tap it to download. |
+| `qa_sheet.jpg` under **Assets** | Thumbnails every half second, to spot problems fast |
+
+On a phone, open the link (signed in to GitHub, as long as the repo is private), tap the newest release, then tap **`<slug>.mp4`** under Assets. On a PC, the same page works in a browser. Save the file to `Downloads\shorts` if you want it with your local videos.
+
+### Made on your PC (VS Code)
+- The video is saved to **`C:\Users\nuel.yosia\Downloads\shorts\<slug>.mp4`**.
+- The working copy stays in `projects\<slug>\out\<slug>.mp4`.
+
+### Is it done yet? Where to check
+
+| Where | What it shows |
+|---|---|
+| Ask Claude **`status?`** in the same session | Plain answer, plus the Release link when it's done |
+| **https://github.com/nuelyosia-cpt/skill_kit_main/actions** → workflow **render** | 🟡 running, ✅ done, ❌ failed. Click a run to see each step. |
+| `projects/<slug>/out/STATUS.md` in the repo | Last state: `stills done`, `done` or `FAILED`, with the end of the log |
+| `projects/<slug>/out/RESULT.md` in the repo | Release link, length, music level and QA results |
+| GitHub mobile app | Turn on **Settings → Notifications → Actions** to get a push notification when a render finishes or fails |
+
+A full 60-second render takes about 1-2 hours. A stills check takes about 5 minutes.
+
+### What's inside a project folder (`projects/<slug>/`)
+
+| File | What it is |
+|---|---|
+| `script.txt` | The narration, exactly as read |
+| `voice.mp3` | Your voiceover (never edited) |
+| `work/PLAN.md` | Claude's shot plan: one row per shot |
+| `work/words.json` | When each word is spoken. Drives the timing and the captions. |
+| `web/story.js`, `web/main.js`, `web/roman.js` | The scenes, the world and the characters |
+| `audio.py` | Music and sound-effect cues |
+| `render.txt` | The render request (`stills` or `full`). Changing it starts a render. |
+| `stills/sheet_*.jpg` | Test-frame sheets from the look check |
+| `out/` | Results: `RESULT.md`, `STATUS.md`, `qa_sheet.jpg` (and the MP4 itself when made on your PC) |
+
+---
+
+## How to ask for things (example prompts)
+
+Open Claude Code (phone: **Claude app → Code → skill_kit_main**; PC: VS Code in this folder) and type in plain English. These all work:
+
+**Starting a video**
+- `ideas`: show this week's list
+- `make 4`, or `make 4 from the newest list`
+- `new video about the invention of the microwave oven`
+- `new video: how Fleming discovered penicillin, about 45 seconds`
+- `give me 10 new ideas, only medicine and food`
+
+**Script and voice**
+- `make the ending punchier` / `cut the joke in line 3` / `ok`
+- `I'll record the voice myself`, then later `voice uploaded`
+- `use ElevenLabs to make the voice` (needs the key set up)
+
+**While it renders**
+- `status?`
+- `show me the stills sheet`
+
+**After you watch it**
+- `fix: at 0:23 the inventor is hidden behind the pillar`
+- `captions are covering his face at 0:40, move them up`
+- `the music is too busy in the eureka moment`
+- `re-render tesla-coil` (any change to its `render.txt` also does this)
+- `youtube text`: title, description and hashtags
+- `list my videos`: every project with its status and Release link
 
 ---
 
@@ -81,6 +160,7 @@ When it's done, Claude gives you a **Release link**. Open it on your phone and d
 | Make the voiceover through ElevenLabs (with your key) | Use your own voice unless you record it or have an ElevenLabs voice of it |
 | Plan shots, build sets, characters, cameras and effects | Copy real cartoons, brands or living people |
 | Mix music and SFX at exactly half the voice level | Guarantee a legend is true: it marks it as a legend instead |
+| Burn in word-by-word captions that follow the voice | Caption a word perfectly if the voice strays from the script (re-record, or fix the script text) |
 | Render on GitHub while your PC is off | Watch the render live: it reads the results when you come back |
 | Check stills and the QA sheet, fix and re-render | Change the kit's engine in `kit/` (read-only by design) |
 

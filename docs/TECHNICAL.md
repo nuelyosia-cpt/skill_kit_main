@@ -21,11 +21,13 @@ You record the voiceover. The kit makes the rest: flat 2D bean-head characters i
 | [scripts/prepare-project.sh](../scripts/prepare-project.sh) | Restores git-ignored generated files (three.js, `toon.js`, Playwright) after a clone. |
 | [scripts/tts.py](../scripts/tts.py) | Makes `voice.mp3` from `script.txt` through the ElevenLabs API. |
 | [scripts/cloud-setup.sh](../scripts/cloud-setup.sh) | Session-start hook for cloud sessions (does nothing on your PC). |
+| [templates/finish.sh](../templates/finish.sh) | Encode + QA, with burned-in captions. Replaces the kit's `finish.sh` in every project. |
+| [scripts/captions.py](../scripts/captions.py) | Builds `work/captions.ass` from `work/words.json` + `script.txt`. |
+| [assets/fonts/](../assets/fonts/) | Caption font (Luckiest Guy, Apache 2.0). |
 | [templates/audio.py](../templates/audio.py) | Music and SFX synths that write stems only. Length follows `voice.mp3`. |
 | [.github/workflows/render.yml](../.github/workflows/render.yml) | The cloud renderer (GitHub Actions). |
 | `ideas/` | Weekly idea lists and `USED.md`. |
 | `projects/<slug>/` | One working folder per video. All building happens here. |
-| `*.zip` | Original downloads of the kit. Not used by the workflow. |
 
 Finished MP4s go to `C:\Users\nuel.yosia\Downloads\shorts`. That folder holds final videos only.
 
@@ -73,7 +75,7 @@ python mix.py voice.mp3 music.wav sfx.wav
 # 7. Render all frames (N = round(voice length in seconds x 30)). RESUME=1 continues after a stop.
 node render.mjs frames "0-1799"
 
-# 8. Encode, normalise loudness to -14 LUFS, and run QA
+# 8. Burn in captions, encode, normalise loudness to -14 LUFS, and run QA (CAPTIONS=0 to skip)
 bash finish.sh "My Short"
 #    Look at out/qa_sheet.jpg. Fix frozen spans of 0.4 s or more, and any black frames.
 ```
@@ -105,7 +107,7 @@ Minutes: a 60 s video is about 1,800 frames. All jobs together use roughly 3-5 r
 - **Never edit or re-time the voice.** The picture follows the voice.
 - **Facts first.** Every story is labelled *documented*, *anecdote* or *legend*. Narration says "the story goes" for anything that is not documented.
 - Only dead historical people appear as characters. Nothing graphic or political.
-- No captions unless asked. Text inside the scene (signs, chalk diagrams, notebooks) must not be mirrored.
+- Captions are always on, burned in by `finish.sh` from the word timings (see SKILL.md 4.9). Text inside the scene (signs, chalk diagrams, notebooks) must not be mirrored.
 - Always mix with `mix.py`, never by hand.
 - Never change files in `kit/`.
 
