@@ -12,6 +12,7 @@ You are making vertical (1080x1920, 30 fps) animated YouTube Shorts about invent
 - `scripts/new-project.sh <slug>`: creates `projects/<slug>/` with everything (engine, tools, `mix.py`, `finish.sh`, the stems-only `audio.py` template, `render.txt`). Use this instead of calling `kit/tools/setup.sh` directly.
 - `scripts/prepare-project.sh projects/<slug>`: restores the git-ignored generated files (three.js, `toon.js`, Playwright). Run it after a fresh clone.
 - `scripts/tts.py projects/<slug>`: makes `voice.mp3` from `script.txt` with ElevenLabs when `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` are set.
+- `templates/finish.sh` + `scripts/captions.py` + `assets/fonts/`: the encode step with burned-in captions (copied into each project by `new-project.sh`).
 - `templates/audio.py`: synths + cue table that writes only `music.wav` and `sfx.wav`. Never use the kit example's `audio.py`, which ducks and mixes by itself.
 - `ideas/YYYY-MM-DD.md`: idea lists (written by the weekly routine or by you). `ideas/USED.md`: one line per idea already made.
 - `projects/<slug>/`: one working folder per video.
@@ -52,7 +53,7 @@ Do all of this yourself. Ask the user only at the two points marked USER.
 ## Rules
 - Never edit or re-time the voice. The picture follows it.
 - Facts first. Never present a legend as fact. Dead historical people only as characters; nothing graphic or political.
-- No captions unless asked. Diegetic text must not be mirrored.
+- Captions are always on: `finish.sh` burns them in from `work/words.json` (SKILL.md 4.9). Keep faces and key objects out of the caption band (y ≈ 1180-1420 px). Diegetic text must not be mirrored.
 - Never change files in `kit/`.
 - Mix only with `mix.py`.
 - Use a task list and keep progress updates short.

@@ -19,7 +19,7 @@ Secondary theme, allowed when it fits: how an infamous object or person came to 
 - **Facts first.** Every story must be a real fact or a clearly labelled legend. Make it interesting by adding surrounding background that is also true: the era, the rival, the failed attempts, the odd detail, the consequence.
 - **Fact-status honesty.** Many famous eureka moments are anecdotes, not documented events. Always say which kind it is, in the idea list and in the script when relevant: *documented* (primary sources, the inventor's own notes), *anecdote* (told by a contemporary or the inventor late in life), or *legend* (unverifiable or probably embellished). Use "the story goes" / "legend says" in the narration for anything that is not documented. Never present a legend as settled fact. A myth-vs-reality twist (e.g. "the apple never hit his head") is a great payoff.
 - Real historical figures who are dead are fine as characters. No living people as the butt of a joke, nothing graphic, nothing political. Keep rivalries (e.g. Newton vs Leibniz) factual and even-handed.
-- No captions unless the user asks. Diegetic text (a carved message, a sign, a chalk diagram, a notebook page) is fine, and it must read correctly (not mirrored).
+- **Captions are always on.** Every video has burned-in captions that follow the voice word by word (see 4.9). They use the exact script text and the timing in `work/words.json`; never retype or paraphrase them. Diegetic text (a carved message, a sign, a chalk diagram, a notebook page) is also fine, and it must read correctly (not mirrored).
 - Never edit or re-time the voice. The picture is timed to it, and every visual reaction lands 0-3 frames before its word.
 - **Audio levels:** the music bed sits at 50 % of the voice level (−6 dB, gated RMS). SFX sit at 50 % or slightly less, with peaks capped so no hit pokes out over the narration. Always mix with `mix.py`, never by hand. Use no ducking or compression that would change this ratio; only one linear gain plus a peak limiter goes on the whole mix.
 - Keep the user informed with a task list. Send a stills contact sheet before the long render.
@@ -96,6 +96,7 @@ Make one row per shot: frames, words, setting, light, camera move, characters/po
 - **Show the idea as a picture.** Use diegetic cards for the insight: a chalk or ink diagram, a notebook page, a curve cut into strips, orbits around a planet. Draw them correctly (not mirrored) and animate them appearing (0..1 progress).
 - Show the invention's consequence in the payoff shot (the thing it became, the rival's reaction, the myth being corrected).
 - The twist line gets a sting (music stops, low hit, push-in with roll). The last shot's physical payoff lands on the final word.
+- **Keep the caption band clear.** Captions sit centred at y ≈ 1300 px (68 % of the height), about 1180-1420 px. Frame faces, eyes, the key object and diagram cards in the upper 60 % of the picture (y < 1150), so the caption never covers them. Busy, bright detail right behind the band makes captions harder to read: prefer ground, deck, water or a darker area there.
 
 ### 4.3 World (`web/main.js`)
 Keep the engine sections: toon materials, ink contract, `add`/`tbox`, sky, lights, cards, render targets/post, `applyLight`, `drawActors`, `swapForNd`, `renderFrame`. Replace the example world between `// ---------- world ----------` and `// ---------- cards ----------`, plus the story parts of `worldState()`.
@@ -131,6 +132,7 @@ Render stills at each shot's middle plus the transitions and key actions: `node 
 - Mirrored text. A detached-part card offset the wrong way. A diagram or equation card that is unreadable at phone size.
 - Extrude material groups: 0 = caps, 1 = sides+top.
 - Missing ink: debug the edge-only output. Ink radius ~2.5 px at 1080. The sky counts as far depth, not a card.
+- A face, the key object or a diagram card inside the caption band (y ≈ 1180-1420 px). Move the character or the camera up.
 Send the sheet to the user with a one-line shot summary, then start the full render.
 
 ### 4.7 Sound (`audio.py` → stems → `mix.py`)
@@ -142,8 +144,16 @@ Rewrite the cue table for the story; the synths stay. `audio.py` writes only ste
 
 ### 4.8 Render + finish
 - Run `node render.mjs frames "0-<N-1>"` with Bash `run_in_background`, watched by a Monitor loop that reports progress and catches errors or process exit. `RESUME=1` continues after an interruption. Don't run heavy Python at the same time on small machines.
-- Run `bash finish.sh "Title"`. It applies one linear gain to about −14 LUFS plus a −1 dBFS peak limiter, encodes H.264 CRF 17 + AAC, runs freeze/black and loudness QA, and writes `out/qa_sheet.jpg`. Look at the sheet. Frozen spans ≥0.4 s or black frames need a fix.
-- Deliver the MP4 with SendUserFile and a few lines on what each shot shows. Offer captions, tweaks, or the next idea from the list.
+- Run `bash finish.sh "<slug>"` (the project copy from `templates/finish.sh`, not the kit's). It builds and burns in the captions (4.9), applies one linear gain to about −14 LUFS plus a −1 dBFS peak limiter, encodes H.264 CRF 17 + AAC, runs freeze/black and loudness QA, prints `captions: ON (N events)`, and writes `out/qa_sheet.jpg`. Look at the sheet. Frozen spans ≥0.4 s, black frames, or `captions: OFF` need a fix.
+- Deliver the MP4 and a few lines on what each shot shows. Offer tweaks or the next idea from the list.
+
+### 4.9 Captions (always on)
+- Source: `work/words.json` from `timing.py` (word start/end times) plus `script.txt` for exact spelling. If the word counts match, the script's spelling is used; otherwise the timing file's. Never edit the voice to fit captions.
+- `finish.sh` runs `scripts/captions.py`, which writes `work/captions.ass` and burns it in with the bundled font `assets/fonts/LuckiestGuy-Regular.ttf` (Apache 2.0).
+- Style: upper case, white with a thick dark outline and soft shadow. The word being spoken is warm yellow. Chunks of 1-3 words, split at punctuation and balanced (4 words → 2 + 2), so no word hangs alone unless its phrase is one word. Each chunk pops in (86 → 104 → 100 % in about 0.16 s). Soft punctuation (`. , ; :`) is dropped and `? !` are kept.
+- Position: centred at x = 540, y = 1300. Options: `--y` (move the band), `--size` (default 104), `--words` (default 3), `--chars` (default 18). If a shot can't avoid the band, move the captions for the whole video rather than per shot, so they don't jump around.
+- Check: grab a frame from the middle of a sentence (`ffmpeg -ss <t> -i out/<slug>.mp4 -frames:v 1 check.jpg`) and look at it. The highlighted word must match what is being said at that moment. If the captions drift, fix `work/words.json` (or install faster-whisper and re-run `timing.py`); never shift the audio.
+- `CAPTIONS=0 bash finish.sh <slug>` turns captions off. Only use it if the user explicitly asks for a version without captions.
 
 ## Engine gotchas (kept in the kit; keep them if rebuilding)
 - `#include <fog_vertex>` / `<fog_fragment>` go on their own lines.

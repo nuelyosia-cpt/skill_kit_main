@@ -15,6 +15,7 @@ if [ ! -s "$P/web/toonbase.js" ]; then
   # Node 22-25 support mode "transform"; Node 26+ only "strip" (enough for toon.ts: no enums or namespaces)
   ( cd "$P" && node -e "const m=require('node:module'),fs=require('fs');const src=fs.readFileSync(process.argv[1],'utf8');let out;try{out=m.stripTypeScriptTypes(src,{mode:'transform'})}catch(e){out=m.stripTypeScriptTypes(src,{mode:'strip'})}fs.writeFileSync('web/toonbase.js',out)" "$ROOT/kit/vendor/toon.ts" )
 fi
+mkdir -p "$P/fonts"; cp "$ROOT"/assets/fonts/*.ttf "$P/fonts/" 2>/dev/null || true
 cat "$P/web/toonbase.js" "$P/web/roman.js" > "$P/web/toon.js"
 # setup.sh links a global playwright; drop the link if it points nowhere, then install locally
 if [ -L "$P/node_modules/playwright" ] && [ ! -e "$P/node_modules/playwright/package.json" ]; then rm -f "$P/node_modules/playwright"; fi

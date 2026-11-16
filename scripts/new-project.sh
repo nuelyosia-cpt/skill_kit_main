@@ -12,7 +12,7 @@ mkdir -p "$P"
 # Git Bash paths to Node); prepare-project.sh below finishes the same work portably.
 bash "$ROOT/kit/tools/setup.sh" "$P" || echo "(setup.sh stopped early; finishing with prepare-project.sh)"
 [ -f "$P/web/main.js" ] && [ -f "$P/render.mjs" ] || { echo "setup.sh did not copy the engine"; exit 1; }
-cp "$ROOT/mix.py" "$ROOT/kit/tools/finish.sh" "$P/"
+cp "$ROOT/mix.py" "$ROOT/templates/finish.sh" "$P/"      # finish.sh with burned-in captions
 cp "$ROOT/templates/audio.py" "$P/audio.py"          # replaces the example's self-mixing audio.py
 bash "$ROOT/scripts/prepare-project.sh" "$P"
 [ -f "$P/render.txt" ] || cat > "$P/render.txt" <<REQ
