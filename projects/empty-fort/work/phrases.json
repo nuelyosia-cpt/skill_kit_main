@@ -1,261 +1,234 @@
 {
- "duration": 54.83102,
- "frames30": 1645,
- "source": "silence-align (cost 0.75)",
+ "duration": 61.048163,
+ "frames30": 1831,
+ "source": "silence-align (cost 0.72)",
  "segments": [
   [
    0.0,
-   2.53828
+   2.87177
   ],
   [
-   3.34891,
-   4.2693
+   3.49181,
+   6.95961
   ],
   [
-   4.55651,
-   6.5283
+   7.72383,
+   11.0127
   ],
   [
-   7.35372,
-   7.94048
+   11.7107,
+   14.3706
   ],
   [
-   8.2222,
-   9.54698
+   15.206,
+   15.5757
   ],
   [
-   9.77372,
-   10.5997
+   15.8815,
+   16.705
   ],
   [
-   11.3808,
-   14.0486
+   17.3882,
+   21.3187
   ],
   [
-   14.4671,
-   15.3833
+   22.0812,
+   23.7331
   ],
   [
-   15.7705,
-   18.9404
+   24.2227,
+   24.8784
   ],
   [
-   19.5053,
-   20.7549
+   25.8547,
+   26.7288
   ],
   [
-   20.9615,
-   21.5671
+   27.4666,
+   28.3323
   ],
   [
-   22.3542,
-   23.1763
+   28.7637,
+   31.0315
   ],
   [
-   24.0396,
-   24.757
+   31.6583,
+   32.1677
   ],
   [
-   25.3279,
-   25.9781
+   33.0098,
+   33.638
   ],
   [
-   26.2437,
-   27.4429
+   34.5949,
+   36.4039
   ],
   [
-   28.1343,
-   28.6203
+   37.0734,
+   38.1194
   ],
   [
-   29.1778,
-   29.6263
+   38.4865,
+   40.4281
   ],
   [
-   30.4546,
-   32.0154
+   41.1414,
+   43.789
   ],
   [
-   32.886,
-   33.7079
+   44.5774,
+   46.3339
   ],
   [
-   34.2468,
-   35.9607
+   46.9484,
+   48.5376
   ],
   [
-   36.5491,
-   38.8507
+   48.9917,
+   50.3797
   ],
   [
-   39.6063,
-   41.0593
+   51.0085,
+   51.6767
   ],
   [
-   41.8761,
-   43.2872
+   52.5922,
+   54.3134
   ],
   [
-   43.7828,
-   44.8471
+   54.7974,
+   57.2303
   ],
   [
-   45.7246,
-   46.2845
-  ],
-  [
-   47.1615,
-   48.7014
-  ],
-  [
-   49.3647,
-   51.4924
-  ],
-  [
-   52.2449,
-   54.5263
+   58.0443,
+   60.6614
   ]
  ],
  "phrases": [
   {
    "text": "The most famous bluff in Chinese history was a wide-open gate.",
    "s": 0.0,
-   "e": 2.538
+   "e": 2.872
   },
   {
-   "text": "It's the year two twenty-eight,",
-   "s": 3.349,
-   "e": 4.269
+   "text": "It's the year two twenty-eight, and China is split into three kingdoms at war.",
+   "s": 3.492,
+   "e": 6.96
   },
   {
-   "text": "and China is split into three kingdoms at war.",
-   "s": 4.557,
-   "e": 6.528
-  },
-  {
-   "text": "Zhuge Liang,",
-   "s": 7.354,
-   "e": 7.94
-  },
-  {
-   "text": "the genius strategist of Shu,",
-   "s": 8.222,
-   "e": 9.547
-  },
-  {
-   "text": "has a terrible problem.",
-   "s": 9.774,
-   "e": 10.6
+   "text": "Zhuge Liang, the genius strategist of Shu, has a terrible problem.",
+   "s": 7.724,
+   "e": 11.013
   },
   {
    "text": "His general Ma Su ignored orders and lost a mountain pass.",
-   "s": 11.381,
-   "e": 14.049
+   "s": 11.711,
+   "e": 14.371
   },
   {
-   "text": "Now, the story goes,",
-   "s": 14.467,
-   "e": 15.383
+   "text": "Now,",
+   "s": 15.206,
+   "e": 15.576
+  },
+  {
+   "text": "the story goes,",
+   "s": 15.882,
+   "e": 16.705
   },
   {
    "text": "a hundred and fifty thousand enemy soldiers are marching on the tiny town of Xicheng.",
-   "s": 15.771,
-   "e": 18.94
+   "s": 17.388,
+   "e": 21.319
   },
   {
    "text": "Leading them is his greatest rival,",
-   "s": 19.505,
-   "e": 20.755
+   "s": 22.081,
+   "e": 23.733
   },
   {
    "text": "Sima Yi.",
-   "s": 20.962,
-   "e": 21.567
+   "s": 24.223,
+   "e": 24.878
   },
   {
    "text": "And inside the walls?",
-   "s": 22.354,
-   "e": 23.176
+   "s": 25.855,
+   "e": 26.729
   },
   {
    "text": "A few thousand men.",
-   "s": 24.04,
-   "e": 24.757
+   "s": 27.467,
+   "e": 28.332
   },
   {
-   "text": "Mostly cooks, clerks,",
-   "s": 25.328,
-   "e": 25.978
-  },
-  {
-   "text": "and very nervous horses.",
-   "s": 26.244,
-   "e": 27.443
+   "text": "Mostly cooks, clerks, and very nervous horses.",
+   "s": 28.764,
+   "e": 31.032
   },
   {
    "text": "He can't fight.",
-   "s": 28.134,
-   "e": 28.62
+   "s": 31.658,
+   "e": 32.168
   },
   {
    "text": "He can't run.",
-   "s": 29.178,
-   "e": 29.626
+   "s": 33.01,
+   "e": 33.638
   },
   {
    "text": "So he does the strangest thing imaginable.",
-   "s": 30.455,
-   "e": 32.015
+   "s": 34.595,
+   "e": 36.404
   },
   {
    "text": "He throws the gates open.",
-   "s": 32.886,
-   "e": 33.708
+   "s": 37.073,
+   "e": 38.119
   },
   {
    "text": "Soldiers dressed as townsfolk sweep the road.",
-   "s": 34.247,
-   "e": 35.961
+   "s": 38.486,
+   "e": 40.428
   },
   {
    "text": "And Zhuge Liang sits on top of the wall and plays the zither.",
-   "s": 36.549,
-   "e": 38.851
+   "s": 41.141,
+   "e": 43.789
   },
   {
    "text": "Sima Yi rides up and stares.",
-   "s": 39.606,
-   "e": 41.059
+   "s": 44.577,
+   "e": 46.334
   },
   {
    "text": "Zhuge Liang never takes risks.",
-   "s": 41.876,
-   "e": 43.287
+   "s": 46.948,
+   "e": 48.538
   },
   {
    "text": "An open gate means a trap.",
-   "s": 43.783,
-   "e": 44.847
+   "s": 48.992,
+   "e": 50.38
   },
   {
    "text": "It has to be.",
-   "s": 45.725,
-   "e": 46.285
+   "s": 51.008,
+   "e": 51.677
   },
   {
    "text": "So he turns his army around and leaves.",
-   "s": 47.161,
-   "e": 48.701
+   "s": 52.592,
+   "e": 54.313
   },
   {
    "text": "One man and a song beat a hundred and fifty thousand.",
-   "s": 49.365,
-   "e": 51.492
+   "s": 54.797,
+   "e": 57.23
   },
   {
    "text": "Sometimes the best defense is letting your enemy scare himself.",
-   "s": 52.245,
-   "e": 54.526
+   "s": 58.044,
+   "e": 60.661
   }
  ]
 }
