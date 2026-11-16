@@ -1,0 +1,6 @@
+# Pipeline self-test on the worked example (stand-in tone voice). Safe to delete.
+mode: full
+title: CI self-test
+frames: 0-59
+shards: 2
+release: no
