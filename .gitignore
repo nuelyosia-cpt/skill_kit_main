@@ -1,0 +1,14 @@
+# Rendered and generated files: rebuilt by scripts/prepare-project.sh or the render workflow
+node_modules/
+projects/*/node_modules/
+projects/*/frames/
+projects/*/stills/*/
+projects/*/out/*.mp4
+projects/*/web/lib/three.module.js
+projects/*/mix.wav
+projects/*/mix_raw.wav
+projects/*/music.wav
+projects/*/sfx.wav
+package-lock.json
+package.json
+__pycache__/
