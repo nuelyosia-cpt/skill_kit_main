@@ -52,12 +52,20 @@ midi = lambda m: 440 * 2 ** ((m - 69) / 12)
 
 # ---------------- music ----------------
 music = np.zeros(N, np.float32)
-BPM = 104; beat = 60 / BPM
-prog = [(57, [57, 60, 64]), (53, [53, 57, 60]), (55, [55, 59, 62]), (52, [52, 56, 59])]  # Am F G E
+BPM = 92; beat = 60 / BPM
+HIJAZ = [62, 63, 66, 67, 69, 70, 72, 74, 75, 78]        # D Eb F# G A Bb C D Eb F#: Egyptian flavour
+ROOTS = [50, 50, 55, 50]                               # D D G D
 def pluck(f, dur=0.35, bright=0.5):
     n = int(dur * SR); t = np.arange(n) / SR
     s = sum((bright ** k) * np.sin(2 * np.pi * f * (k + 1) * t) / (k + 1) for k in range(6))
     return (s * env(n, 0.003, dur * 0.35)).astype(np.float32)
+def zither(f, dur=0.9, bend=0.0):
+    """oud-like pluck: bright attack, quick decay, small slide"""
+    n = int(dur * SR); t = np.arange(n) / SR
+    fr = f * (1 + bend * (1 - np.exp(-t * 18)))
+    ph = 2 * np.pi * np.cumsum(fr) / SR
+    s = sum((0.6 ** k) * np.sin((k + 1) * ph) / (k + 1) ** 0.7 for k in range(8))
+    return (s * np.exp(-t * 4.0) * np.minimum(1, t / 0.002)).astype(np.float32)
 def brass(fs, dur):
     n = int(dur * SR); t = np.arange(n) / SR; s = np.zeros(n)
     for f in fs:
@@ -65,36 +73,45 @@ def brass(fs, dur):
         s += sum(np.sin((k + 1) * ph) / (k + 1) ** 1.3 for k in range(8))
     a = np.minimum(1, t / 0.08) * np.minimum(1, (dur - t) / 0.15).clip(0)
     return lp_fast((s * a).astype(np.float32), 1800) / len(fs)
+def pad(fs, dur):
+    n = int(dur * SR); t = np.arange(n) / SR
+    s = sum(np.sin(2 * np.pi * f * t) + 0.3 * np.sin(2 * np.pi * 2 * f * t) for f in fs) / len(fs)
+    a = np.minimum(1, t / 0.6) * np.minimum(1, (dur - t) / 0.6).clip(0)
+    return (s * a).astype(np.float32)
 def drum(kind):
-    if kind == "kick":
-        n = int(0.35 * SR); t = np.arange(n) / SR; f = 50 + 90 * np.exp(-t * 30)
-        return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 9)).astype(np.float32)
-    n = int(0.18 * SR); t = np.arange(n) / SR
-    s = rng.standard_normal(n) * np.exp(-t * 28) * 0.6 + np.sin(2 * np.pi * 190 * t) * np.exp(-t * 20) * 0.5
-    return hp_fast(s.astype(np.float32), 300)
+    if kind == "kick":   # big low war drum
+        n = int(0.5 * SR); t = np.arange(n) / SR; f = 45 + 70 * np.exp(-t * 22)
+        return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 7)).astype(np.float32)
+    n = int(0.16 * SR); t = np.arange(n) / SR   # small rim/wood block
+    s = np.sin(2 * np.pi * 820 * t) * np.exp(-t * 60) + rng.standard_normal(n) * np.exp(-t * 80) * 0.3
+    return s.astype(np.float32)
 
-MUSIC_END = 14.15  # music stops on "The bridge is not safe"
+END = 1866 / 30   # resolving chord on "down"
+def doum():   # deep frame drum
+    n = int(0.45 * SR); t = np.arange(n) / SR; f = 70 + 60 * np.exp(-t * 25)
+    return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 8)).astype(np.float32)
+def tek():    # rim tap
+    n = int(0.08 * SR); t = np.arange(n) / SR
+    return (hp_fast((rng.standard_normal(n) * np.exp(-t * 90)).astype(np.float32), 2000) * 0.7 + np.sin(2 * np.pi * 1200 * t) * np.exp(-t * 70) * 0.3).astype(np.float32)
+# maqsum-like rhythm: D t t D t (8 eighths per bar)
+PAT = ["D", "t", "", "t", "D", "", "t", ""]
+mel = [0, 2, 3, 4, 3, 2, 1, 0, 4, 5, 4, 3, 2, 3, 1, 0]
 bar = 0; tt = 0.0
-while tt < MUSIC_END:
-    root, ch = prog[bar % 4]
-    place(music, brass([midi(m) for m in ch], beat * 4 * 0.98), tt, 0.10)
-    for b in range(4):
-        tb = tt + b * beat
-        if tb >= MUSIC_END: break
-        place(music, drum("kick" if b % 2 == 0 else "snare"), tb, 0.55 if b % 2 == 0 else 0.32)
-        place(music, pluck(midi(root - 12), 0.4, 0.4), tb, 0.35)
-        place(music, pluck(midi(ch[(b + bar) % 3] + 12), 0.22, 0.6), tb + beat / 2, 0.13)
-    if bar % 2 == 1:  # little fanfare figure
-        for k, m in enumerate([ch[0] + 12, ch[1] + 12, ch[2] + 12]):
-            place(music, brass([midi(m)], beat * 0.45), tt + 2 * beat + k * beat * 0.5, 0.07)
+while tt < END - 0.2:
+    root = ROOTS[bar % 4]
+    place(music, pad([midi(root + 12), midi(root + 19)], beat * 4), tt, 0.045)
+    for e8 in range(8):
+        te = tt + e8 * beat / 2
+        if te >= END - 0.2: break
+        if PAT[e8] == "D": place(music, doum(), te, 0.55)
+        elif PAT[e8] == "t": place(music, tek(), te, 0.18)
+        if e8 % 2 == 0: place(music, pluck(midi(root - 12), 0.5, 0.35), te, 0.22 if e8 == 0 else 0.12)
+        if e8 in (1, 3, 4, 6): place(music, zither(midi(HIJAZ[(mel[(bar * 4 + e8) % 16] + (bar // 4)) % 8]), 0.6, 0.015), te, 0.14)
     bar += 1; tt += beat * 4
-# fade the bed at the stop
-i0 = int((MUSIC_END - 0.08) * SR); music[i0:] *= np.linspace(1, 0, N - i0) ** 8
-# tension drone from the sting to the end
-dn = int((DUR - MUSIC_END) * SR); td = np.arange(dn) / SR
-drone = (np.sin(2 * np.pi * 55 * td) + 0.5 * np.sin(2 * np.pi * 82.4 * td) + 0.3 * np.sin(2 * np.pi * 110.3 * td)) * np.minimum(1, td / 1.2)
-drone = lp_fast(drone.astype(np.float32), 600)
-place(music, drone, MUSIC_END, 0.09)
+i0 = int((END - 0.25) * SR); music[i0:] *= np.linspace(1, 0, N - i0) ** 3
+# warm resolving chord on the last word
+for k, m in enumerate([50, 57, 62, 66, 69]): place(music, zither(midi(m), 2.6), END + k * 0.04, 0.22)
+place(music, pad([midi(50), midi(57), midi(62)], DUR - END), END, 0.08)
 
 # ---------------- sfx ----------------
 sfx = np.zeros(N, np.float32)
@@ -162,25 +179,54 @@ def water(d):
     return (lp_fast(noise(d), 900) * 0.5 + hp_fast(lp_fast(noise(d), 3000), 1200) * 0.15 * (0.6 + 0.4 * np.sin(2 * np.pi * 0.4 * t))).astype(np.float32)
 
 F = lambda f: f / 30
-place(sfx, whoosh(0.6), F(18), 0.5)            # hook camera pull-back
-place(sfx, leaves(2.2), F(62), 0.35)           # the years blow past
-place(sfx, thunk(85, 0.35), F(120), 1.0)       # spear stamp on "post"
-place(sfx, rumble(2.2), F(176), 0.9)           # empire collapses
-place(sfx, crash(1.4), F(186), 0.7)
-place(sfx, whoosh(0.5), F(196), 0.35)          # rack to the soldier
-place(sfx, cuckoo(), F(255), 0.35)             # "crazy"
-place(sfx, whoosh(0.4), F(276), 0.6)           # time jump flash
-for k in range(2): place(sfx, snore(1.15), F(286) + k * 1.45, 0.45)
-place(sfx, scrape(0.9), F(316), 0.6)           # helmet lifted
-place(sfx, ting(), F(392), 0.55)               # the carving glints
-place(sfx, sting(), 14.18, 0.85)               # "The bridge is not safe."
-place(sfx, creak(0.55, 120), F(464), 0.9); place(sfx, creak(0.5, 160), F(473), 0.7)
-place(sfx, whoosh(0.7), F(484), 0.5)           # crane under the deck
-place(sfx, water(DUR - F(484)), F(484), 0.35)
-place(sfx, creak(0.8, 90), F(536), 1.0)
-place(sfx, snap(), F(548), 0.9)                # brace breaks on "rotting"
-place(sfx, splash(1.0), F(580), 0.9)
+def boing():
+    n = int(0.5 * SR); t = np.arange(n) / SR; f = 520 * np.exp(-t * 3) + 120
+    return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 5)).astype(np.float32)
+def shimmer(d=1.6):
+    n = int(d * SR); t = np.arange(n) / SR; s = np.zeros(n)
+    for k, f0 in enumerate([880, 1320, 1760, 2200]): s += np.sin(2 * np.pi * np.cumsum(f0 * (1 + 0.6 * t / d)) / SR) * (0.5 + 0.5 * np.sin(2 * np.pi * (6 + k) * t))
+    return (s * (t / d) ** 2 * 0.25).astype(np.float32)
+def rustle(d=0.6):
+    x = hp_fast(lp_fast(noise(d), 5000), 1500); n = len(x); t = np.arange(n) / SR
+    return (x * (0.5 + 0.5 * np.abs(np.sin(2 * np.pi * 7 * t))) * np.minimum(1, (d - t) / 0.2)).astype(np.float32)
+def clang():
+    n = int(0.9 * SR); t = np.arange(n) / SR
+    return (sum(np.sin(2 * np.pi * f * t) * np.exp(-t * dk) for f, dk in [(620, 5), (1490, 7), (2310, 9)]) * 0.4).astype(np.float32)
+def whinny(d=1.0):
+    n = int(d * SR); t = np.arange(n) / SR; f = 700 + 300 * np.sin(2 * np.pi * 11 * t) * np.exp(-t * 2) - 300 * t / d
+    s = np.sin(2 * np.pi * np.cumsum(f) / SR) + 0.4 * np.sin(4 * np.pi * np.cumsum(f) / SR)
+    return lp_fast((s * env(n, 0.04, 0.4)).astype(np.float32), 2500) * 0.6
+def hoof():
+    n = int(0.12 * SR); t = np.arange(n) / SR
+    return (np.sin(2 * np.pi * 180 * t) * np.exp(-t * 60) + lp_fast(noise(0.12), 1500) * np.exp(-t * 50) * 0.5).astype(np.float32)
+def swish(d=0.35): x = hp_fast(lp_fast(noise(d), 4000), 600); t = np.arange(len(x)) / SR; return (x * np.sin(np.pi * t / d) ** 2 * 0.6).astype(np.float32)
+def pop(): n = int(0.12 * SR); t = np.arange(n) / SR; return (np.sin(2 * np.pi * np.cumsum(300 + 900 * t / 0.12) / SR) * np.exp(-t * 30)).astype(np.float32)
 
+place(sfx, whoosh(0.9), F(10), 0.5)            # tilt up the pyramid on "tallest"
+place(sfx, whoosh(0.5), F(60), 0.4)             # whip down to Thales
+for k in range(4): place(sfx, pop(), F(94 + k * 5), 0.25)   # finger wiggle "without touching"
+place(sfx, whoosh(0.4), F(126), 0.5)            # flash to the map
+place(sfx, rustle(0.7), F(130), 0.5)            # map
+place(sfx, thunk(70, 0.3), F(160), 0.6)         # "600 BC"
+for k in range(5): place(sfx, swish(0.15), F(259 + k * 7), 0.2)  # dotted route drawing
+place(sfx, shimmer(1.6), F(330), 0.45)          # the Great Pyramid
+place(sfx, pop(), F(468), 0.5)                  # "?"
+place(sfx, swish(0.4), F(536), 0.4)             # tape zip
+place(sfx, boing(), F(572), 0.45)               # tape far too short
+place(sfx, whoosh(0.5), F(600), 0.45)           # rope thrown up
+place(sfx, whoosh(0.6), F(622), 0.35); place(sfx, thunk(90, 0.3), F(640), 0.6)  # rope slides back, thud
+for k in range(5): place(sfx, creak(0.35, 150 + k * 12), F(652 + k * 17), 0.5)   # wobbly ladder
+for k in range(6): place(sfx, ting(), F(742 + k * 12), 0.08)                    # tick-tock, he waits
+place(sfx, shimmer(1.4), F(990), 0.55)          # the moment builds
+place(sfx, ting(), F(1035), 0.75)               # EUREKA on "tall"
+place(sfx, whoosh(1.0), F(1060), 0.5)           # the big pull-back
+place(sfx, sting(), F(1209), 0.45)              # "Even the pyramid."
+place(sfx, rustle(0.8), F(1259), 0.35)          # rope laid on the sand
+place(sfx, whoosh(0.9), F(1368), 0.5); place(sfx, ting(), F(1405), 0.55)          # the line swings up to the apex
+place(sfx, pop(), F(1426), 0.4); place(sfx, pop(), F(1472), 0.4)               # ladder / rope icons
+place(sfx, ting(), F(1532), 0.4)                # one idea
+for f0 in (1700, 1716, 1737): place(sfx, ting(), F(f0), 0.45)                  # trees, towers, mountains
+place(sfx, whoosh(0.5), F(1772), 0.35)          # into the sunset
 def write_stem(path, x):
     x = np.asarray(x, np.float32)
     peak = float(np.abs(x).max()) or 1.0

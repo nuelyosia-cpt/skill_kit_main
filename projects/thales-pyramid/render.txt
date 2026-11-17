@@ -1,9 +1,9 @@
 # Render request. Pushing a change to this file starts the GitHub Actions render.
 # mode: stills  -> renders the frames listed in "stills" and commits stills/sheet_ci.jpg back
 # mode: full    -> renders the whole video, publishes the MP4 as a GitHub Release
-mode: stills
-title: thales-pyramid
-stills: 5,40,90,150
+mode: full
+title: The Shadow That Measured a Pyramid
+stills: 60,220,490,700,870,1035,1180,1395,1720,1880
 # frames: 0-59     (optional: render only this range, for tests)
 # shards: 6        (optional: parallel render jobs, default 6)
 # release: no      (optional: skip the GitHub Release, for tests)
