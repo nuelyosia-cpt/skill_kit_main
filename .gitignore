@@ -16,3 +16,6 @@ projects/*/fonts/
 
 # The skill is kept privately in the Claude account / ~/.claude/skills, never in this public repo
 /SKILL.md
+
+# Idea lists live in the private repo nuelyosia-cpt/skill_kit_ideas, never here
+/ideas/

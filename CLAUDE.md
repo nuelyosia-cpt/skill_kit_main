@@ -14,20 +14,22 @@ You are making vertical (1080x1920, 30 fps) animated YouTube Shorts about three 
 - `scripts/tts.py projects/<slug>`: makes `voice.mp3` from `script.txt` with ElevenLabs when `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` are set.
 - `templates/finish.sh` + `scripts/captions.py` + `assets/fonts/`: the encode step with burned-in captions (copied into each project by `new-project.sh`).
 - `templates/audio.py`: synths + cue table that writes only `music.wav` and `sfx.wav`. Never use the kit example's `audio.py`, which ducks and mixes by itself.
-- `ideas/YYYY-MM-DD.md`: idea lists (written by the weekly routine or by you). `ideas/USED.md`: one line per idea already made.
+- **Ideas live in the PRIVATE repo `nuelyosia-cpt/skill_kit_ideas`**, checked out next to this one as `../skill_kit_ideas` (call it `$IDEAS`). `$IDEAS/YYYY-MM-DD.md`: idea lists (written by the weekly routine or by you). `$IDEAS/USED.md`: one line per idea already made. Never put idea lists in this public repo.
+  - Getting it: if `../skill_kit_ideas` does not exist, in cloud mode attach it with the `add_repo` tool (owner `nuelyosia-cpt`, repo `skill_kit_ideas`, access `push`) and clone it to `../skill_kit_ideas` as that tool says; in local mode run `git clone https://github.com/nuelyosia-cpt/skill_kit_ideas ../skill_kit_ideas`. Then `git -C ../skill_kit_ideas pull --rebase`.
+  - Saving: after any change there, `git -C ../skill_kit_ideas add -A`, commit, `pull --rebase` and push to its `main` branch (the user allows direct pushes to `main` in that repo). Never mention or quote the idea lists in this public repo's commits, PRs or files.
 - `projects/<slug>/`: one working folder per video.
 - `.github/workflows/render.yml`: the cloud renderer, started by pushing `projects/<slug>/render.txt`.
 - Local only: **finished videos go to `%USERPROFILE%\Downloads\shorts`** (Git Bash: `~/Downloads/shorts`). Only final MP4s go there.
 
 ## When the user says "ideas"
-Show the newest `ideas/*.md` list (numbered, with the Recommended pick), skipping anything in `ideas/USED.md`. If there is no list from the last 7 days, make a new one (step 1 below) and save it.
+Show the newest `$IDEAS/*.md` list (numbered, with the Recommended pick), skipping anything in `$IDEAS/USED.md`. If there is no list from the last 7 days, make a new one (step 1 below) and save it.
 
 ## When the user says "new video" (or gives a topic, or picks an idea number)
 Do all of this yourself. Ask the user only at the two points marked USER.
 
-1. **Ideas.** Follow the skill's stage 2. Web-search every idea's key facts first. Give exactly 10 numbered ideas mixing the three themes (about 4 inventions, 3 big brain moments, 3 turning points unless the user asks for one theme), each with theme, title, hook, eureka / turning point, ending (twist, moral or engagement; the skill's stage 2), why it animates, and fact status (documented / anecdote / legend). Mark your single best pick as "Recommended". Save them as `ideas/<today>.md`. Use AskUserQuestion if available. Skip this step if the user already picked from a saved list.
+1. **Ideas.** Follow the skill's stage 2. Web-search every idea's key facts first. Give exactly 10 numbered ideas mixing the three themes (about 4 inventions, 3 big brain moments, 3 turning points unless the user asks for one theme), each with theme, title, hook, eureka / turning point, ending (twist, moral or engagement; the skill's stage 2), why it animates, and fact status (documented / anecdote / legend). Mark your single best pick as "Recommended". Save them as `$IDEAS/<today>.md` and push that repo. Use AskUserQuestion if available. Skip this step if the user already picked from a saved list.
    **USER: picks a number** (or gives their own topic).
-2. **Script.** Follow the skill's stage 3. Target about 60 s: 200-215 words at the user's ElevenLabs voice (about 3.3 words per second). Say "supposedly" / "the story goes" for anything that is not documented. Run `bash scripts/new-project.sh <slug>`, save `projects/<slug>/script.txt`, add the idea to `ideas/USED.md`, show the script in chat with the word count. In cloud mode commit and push now, so the script is safe.
+2. **Script.** Follow the skill's stage 3. Target about 60 s: 200-215 words at the user's ElevenLabs voice (about 3.3 words per second). Say "supposedly" / "the story goes" for anything that is not documented. Run `bash scripts/new-project.sh <slug>`, save `projects/<slug>/script.txt`, add the idea to `$IDEAS/USED.md` (push that repo), show the script in chat with the word count. In cloud mode commit and push now, so the script is safe.
 3. **Voiceover.**
    - If `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` are set: run `python3 scripts/tts.py projects/<slug>` and tell the user the voice is done (length in seconds). No upload needed.
    - Otherwise tell the user to record it in ElevenLabs (no music, read exactly) and either upload `voice.mp3` here, or (from a phone) open the repo on github.com → `projects/<slug>/` → Add file → Upload files, commit to the branch you name, and then say "voice uploaded". In cloud mode, `git pull` to get it.
