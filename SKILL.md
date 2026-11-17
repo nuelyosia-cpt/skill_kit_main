@@ -1,24 +1,31 @@
 ---
 name: cartoon-audio-short
-description: Make a vertical animated cartoon short about an inventor, an invention, or a "eureka" discovery moment (Newton's apple, Archimedes in the bath, Newton inventing calculus). Offers 10 fact-checked ideas, writes the script, then turns the user's voiceover into a finished MP4 with music and SFX at half the voice level. Use for any inventor/invention story video, cartoon short, or animated story video request.
+description: Make a vertical animated cartoon short about an inventor or invention, a "big brain" moment (a genius idea and how it was pulled off, real, viral or from a famous story), or a famous character's turning point. Offers 10 checked ideas across those three themes, writes the script, then turns the user's voiceover into a finished MP4 with music and SFX at half the voice level. Use for any inventor/invention story, big-brain moment, turning-point story, cartoon short or animated story video request.
 ---
 
-# Cartoon short: inventor idea → script → voiceover → finished MP4
+# Cartoon short: idea → script → voiceover → finished MP4
 
 The look: flat 2D bean-head cartoon characters (canvas-drawn "cards" with plum outlines) in a colourful 3D world with black ink outlines, painted textures, depth-of-field and gliding cameras. The output is 1080x1920, 30 fps, exactly as long as the voiceover. The user's voice is unchanged. The music bed and SFX are synthesized and sit at **50 % of the voice level**. Proven on "The Soldier Who Never Left" (19.7 s, 8 shots).
 
 ## Channel concept (read this first)
-Every video is about **how an invention or discovery came to be**: the problem, the struggle, and the "eureka" moment, told as one surprising story. Examples of the kind of story wanted:
-- Newton and the falling apple that led to gravity.
-- Newton inventing calculus (fluxions / the integral) on his own during the plague years.
-- Archimedes shouting "Eureka!" after the bath-water insight.
-Secondary theme, allowed when it fits: how an infamous object or person came to be (a famous hoax, a notorious machine, a legendary blunder), still told as an origin story.
+Every video is **one surprising story built around a brilliant idea or a moment that changed everything**: the problem, the struggle, and the payoff. There are three themes; every idea list mixes all three.
+
+1. **Invention / inventor**: how an invention or discovery came to be (the problem, the failed attempts, the "eureka").
+   - Newton and the falling apple; Newton inventing calculus during the plague years; Archimedes' bath; the Wright brothers' twisted box.
+2. **Big brain moment**: a genius idea **and its execution**, a clever trick, plan or solution that worked against the odds. It can be:
+   - *Real history*: Thales measuring the Great Pyramid with his shadow; Le Verrier finding Neptune with maths; Wald armouring the planes where there were no bullet holes.
+   - *Famous or viral*: a well-known clever stunt, marketing trick or problem-solving story (e.g. 3M handing out free Post-it pads in Boise after the launch flopped).
+   - *Fiction, myth or legend*: a famous clever plan from a story (the Trojan Horse, the crow dropping pebbles into the pitcher, Zhuge Liang's empty fort, a Sherlock Holmes deduction).
+3. **Turning point of a famous character**: how and why a person (or animal) became famous, centred on the single moment where everything changed (Hachikō's years of waiting, Mary Anning's sea monster, Ramanujan's letter to Cambridge, Violet Jessop's three ships).
+
+Whatever the theme, the video must show a clear **big idea and how it was executed**, or a **big turning point**. A story with no clever idea and no turning point is not a fit, however famous it is.
 
 ## Rules
-- Stories, characters and shots are always original (our own drawings, our own words), but the subject is a real inventor, discovery or invention.
+- Stories, characters and shots are always original (our own drawings, our own words). The subject is a real person, invention or event, or a well-known story told in our own words.
+- **Fiction and myths:** prefer public-domain sources (myths, fables, folk tales, classic literature such as Sherlock Holmes or the *Romance of the Three Kingdoms*). For a modern copyrighted film, show, book or game, only talk *about* the famous idea in our own words; never recreate its characters' designs, names-as-branding, logos, art, music or scenes.
 - **Facts first.** Every story must be a real fact or a clearly labelled legend. Make it interesting by adding surrounding background that is also true: the era, the rival, the failed attempts, the odd detail, the consequence.
-- **Fact-status honesty.** Many famous eureka moments are anecdotes, not documented events. Always say which kind it is, in the idea list and in the script when relevant: *documented* (primary sources, the inventor's own notes), *anecdote* (told by a contemporary or the inventor late in life), or *legend* (unverifiable or probably embellished). Use "the story goes" / "legend says" in the narration for anything that is not documented. Never present a legend as settled fact. A myth-vs-reality twist (e.g. "the apple never hit his head") is one great way to end, but not the only one (see the ending types in Stage 3).
-- Real historical figures who are dead are fine as characters. No living people as the butt of a joke, nothing graphic, nothing political. Keep rivalries (e.g. Newton vs Leibniz) factual and even-handed.
+- **Fact-status honesty.** Many famous eureka moments are anecdotes, not documented events. Always say which kind it is, in the idea list and in the script when relevant: *documented* (primary sources, the inventor's own notes), *anecdote* (told by a contemporary or the inventor late in life), *legend* (unverifiable or probably embellished), or *fiction* (from a novel, myth, fable or film: say so in the narration, e.g. "In the novel…", "In the Greek myth…"). Use "the story goes" / "legend says" in the narration for anything that is not documented. Never present a legend as settled fact. A myth-vs-reality twist (e.g. "the apple never hit his head") is one great way to end, but not the only one (see the ending types in Stage 3).
+- Real historical figures who are dead are fine as characters. Living people are not drawn as characters; a viral story about a living person is told through the idea, the object and the result instead. No living people as the butt of a joke, nothing graphic, nothing political. Keep rivalries (e.g. Newton vs Leibniz) factual and even-handed.
 - **Captions are always on.** Every video has burned-in captions that follow the voice word by word (see 4.9). They use the exact script text and the timing in `work/words.json`; never retype or paraphrase them. Diegetic text (a carved message, a sign, a chalk diagram, a notebook page) is also fine, and it must read correctly (not mirrored).
 - Never edit or re-time the voice. The picture is timed to it, and every visual reaction lands 0-3 frames before its word.
 - **Audio levels:** the music bed sits at 50 % of the voice level (−6 dB, gated RMS). SFX sit at 50 % or slightly less, with peaks capped so no hit pokes out over the narration. Always mix with `mix.py`, never by hand. Use no ducking or compression that would change this ratio; only one linear gain plus a peak limiter goes on the whole mix.
@@ -32,25 +39,27 @@ Otherwise ask one AskUserQuestion (or plain text if that tool is missing): **"Wh
 - **Need video ideas and a script**: go to Stage 2.
 Also ask the target length if they haven't said. The default is **about 60 s** (45-60 s); 20-30 s is allowed for simple single-moment stories.
 
-## Stage 2: 10 inventor / invention ideas
-Give exactly 10 ideas in one reply, numbered, and ask the user to reply with a number (or "more"). The focus is **how the invention or discovery was come up with**. Each idea gets:
+## Stage 2: 10 ideas (inventions, big brain moments, turning points)
+Give exactly 10 ideas in one reply, numbered, and ask the user to reply with a number (or "more"). **Mix the three themes** from the channel concept: by default about 4 inventions, 3 big brain moments and 3 turning points, unless the user asks for one theme. Label each idea with its theme. The focus is always **the big idea and how it was executed, or the turning point**. Each idea gets:
 - **Title** (5-8 words, curiosity-driven, e.g. "The Apple That Never Hit Newton").
 - **Hook line**: the first spoken sentence, a paradox or surprising claim stated as fact ("Isaac Newton invented calculus while hiding from a plague.").
-- **The eureka**: the exact moment or insight, in one line.
+- **Theme**: invention, big brain moment, or turning point.
+- **The eureka / turning point**: the exact moment of insight (and how it was executed), or the moment everything changed, in one line.
 - **The ending**: the last beat of the video, and say which type it is. It does **not** have to be a plot twist. Pick whichever fits the story best:
   - *Twist*: an ironic or surprising reveal (the consequence nobody expected, the rivalry, the myth-vs-reality reveal).
   - *Moral*: a short lesson or value the story shows ("Sometimes the best defense is letting your enemy scare himself.").
   - *Engagement*: a closing line that emphasizes the idea or the person and leaves the viewer impressed or curious (what it changed, why it still matters, a question back to the viewer).
 - **Why it animates well**: the 2-3 big visual moments (the apple drop, the overflowing bath, equations appearing in the air).
-- **Fact status**: *documented*, *anecdote* or *legend*, with one line saying where the story comes from.
+- **Fact status**: *documented*, *anecdote*, *legend* or *fiction*, with one line saying where the story comes from.
 
 What makes an idea "perfect" for this format:
-- One inventor, one problem, one breakthrough, with a physical cause and effect you can show.
+- One person (or team), one problem, one breakthrough or turning point, with a physical cause and effect you can show.
+- **Big brain test**: the viewer should think "that's so clever" or "that changed everything" at the eureka. If you can't say the clever idea in one sentence, it's not a big brain moment.
 - Escalating struggle: failed attempts, doubters, obsession, a deadline or a rival, then the insight.
 - A setting that can be built from simple 3D shapes plus cartoon cards (a garden, a bathhouse, a workshop, a lab, a study, a ship, a bridge, a palace).
-- Mix the 10 across eras and fields: ancient, medieval, 1700s, 1800s, modern; physics, maths, medicine, engineering, everyday objects, accidents that became inventions. Include at most two ideas per inventor and keep at least two that are **not** physics or maths.
+- Mix the 10 across themes, eras and fields: ancient, medieval, 1700s, 1800s, modern; physics, maths, medicine, engineering, everyday objects, strategy, business, myths, people and animals. Include at most two ideas per person or story and keep at least two that are **not** physics or maths. At most two fiction/myth ideas per list.
 - Include a few abstract-idea stories (like calculus) only if there is a concrete visual way to show them: a falling object, a curve being sliced into strips, a moving cart, shapes stacking up. If it can't be shown, pick another.
-- **Verify before offering.** Run a web search on the key facts of every idea (dates, places, names, who said what, where the anecdote first appears) before including it. Prefer primary or scholarly sources (museum and university pages, the inventor's own papers, encyclopaedias). Drop or relabel anything you can't confirm.
+- **Verify before offering.** Run a web search on the key facts of every idea (dates, places, names, who said what, where the anecdote first appears) before including it. For fiction, check the source work and that the plot detail is told correctly. Prefer primary or scholarly sources (museum and university pages, the inventor's own papers, encyclopaedias). Drop or relabel anything you can't confirm.
 - No real living people as the butt of a joke, nothing graphic and nothing political.
 
 ## Stage 3: Script (after they pick)

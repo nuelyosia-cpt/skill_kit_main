@@ -1,6 +1,6 @@
 # Cartoon shorts: automatic workflow
 
-You are making vertical (1080x1920, 30 fps) animated YouTube Shorts about inventors, inventions and "eureka" discovery stories.
+You are making vertical (1080x1920, 30 fps) animated YouTube Shorts about three themes: inventions and inventors, "big brain" moments (a genius idea and how it was executed: real, viral or from a famous story/myth), and famous characters' turning points. See the channel concept in SKILL.md.
 
 ## Which mode am I in?
 - **Cloud mode**: the environment variable `CLAUDE_CODE_REMOTE` is `true` (Claude Code on the web or the phone app, or a scheduled routine). The repo is at `$CLAUDE_PROJECT_DIR`. Rendering happens in GitHub Actions, not in the session. Use `python3`.
@@ -25,7 +25,7 @@ Show the newest `ideas/*.md` list (numbered, with the Recommended pick), skippin
 ## When the user says "new video" (or gives a topic, or picks an idea number)
 Do all of this yourself. Ask the user only at the two points marked USER.
 
-1. **Ideas.** Follow SKILL.md stage 2. Web-search every idea's key facts first. Give exactly 10 numbered ideas with title, hook, eureka, ending (twist, moral or engagement; SKILL.md stage 2), why it animates, and fact status (documented / anecdote / legend). Mark your single best pick as "Recommended". Save them as `ideas/<today>.md`. Use AskUserQuestion if available. Skip this step if the user already picked from a saved list.
+1. **Ideas.** Follow SKILL.md stage 2. Web-search every idea's key facts first. Give exactly 10 numbered ideas mixing the three themes (about 4 inventions, 3 big brain moments, 3 turning points unless the user asks for one theme), each with theme, title, hook, eureka / turning point, ending (twist, moral or engagement; SKILL.md stage 2), why it animates, and fact status (documented / anecdote / legend / fiction). Mark your single best pick as "Recommended". Save them as `ideas/<today>.md`. Use AskUserQuestion if available. Skip this step if the user already picked from a saved list.
    **USER: picks a number** (or gives their own topic).
 2. **Script.** Follow SKILL.md stage 3. Target about 60 s: 200-215 words at the user's ElevenLabs voice (about 3.3 words per second). Say "supposedly" / "the story goes" for anything that is not documented. Run `bash scripts/new-project.sh <slug>`, save `projects/<slug>/script.txt`, add the idea to `ideas/USED.md`, show the script in chat with the word count. In cloud mode commit and push now, so the script is safe.
 3. **Voiceover.**
@@ -52,7 +52,7 @@ Do all of this yourself. Ask the user only at the two points marked USER.
 
 ## Rules
 - Never edit or re-time the voice. The picture follows it.
-- Facts first. Never present a legend as fact. Dead historical people only as characters; nothing graphic or political.
+- Facts first. Never present a legend as fact, and always say when a story is fiction or myth. Dead historical people only as characters; nothing graphic or political.
 - Captions are always on: `finish.sh` burns them in from `work/words.json` (SKILL.md 4.9). Keep faces and key objects out of the caption band (y ≈ 1180-1420 px). Diegetic text must not be mirrored.
 - Never change files in `kit/`.
 - Mix only with `mix.py`.
