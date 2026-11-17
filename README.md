@@ -2,7 +2,7 @@
 
 Turn "eureka" stories (how inventions and discoveries really happened) into finished 60-second vertical cartoon Shorts. You make about three small decisions per video. Claude and GitHub do the rest, and you can do all of it from your phone.
 
-> Technical details (files, commands, the render workflow): [docs/TECHNICAL.md](docs/TECHNICAL.md). The rules Claude follows: [CLAUDE.md](CLAUDE.md) and [SKILL.md](SKILL.md).
+> Technical details (files, commands, the render workflow): [docs/TECHNICAL.md](docs/TECHNICAL.md). The rules Claude follows: [CLAUDE.md](CLAUDE.md) and the private `cartoon-audio-short` skill in the owner's Claude account.
 
 ---
 
@@ -90,7 +90,7 @@ Every finished video becomes a **GitHub Release**:
 On a phone, open the link (signed in to GitHub, as long as the repo is private), tap the newest release, then tap **`<slug>.mp4`** under Assets. On a PC, the same page works in a browser. Save the file to `Downloads\shorts` if you want it with your local videos.
 
 ### Made on your PC (VS Code)
-- The video is saved to **`C:\Users\nuel.yosia\Downloads\shorts\<slug>.mp4`**.
+- The video is saved to **`%USERPROFILE%\Downloads\shorts\<slug>.mp4`**.
 - The working copy stays in `projects\<slug>\out\<slug>.mp4`.
 
 ### Is it done yet? Where to check
@@ -184,7 +184,7 @@ You only do this once.
 3. **Weekly ideas.** A scheduled routine posts 10 new ideas every Monday morning into `ideas/`. Type `/schedule` in Claude Code to view, pause or change it.
 4. **GitHub Actions.** Nothing to do. If the first render fails with a "permission denied" message when pushing, open the repo **Settings → Actions → General → Workflow permissions** and choose **Read and write**.
 
-Rendering on your own PC still works too. Open this folder in VS Code and say "new video". Finished files then go to `C:\Users\nuel.yosia\Downloads\shorts`.
+Rendering on your own PC still works too. Open this folder in VS Code and say "new video". Finished files then go to `%USERPROFILE%\Downloads\shorts`.
 
 ---
 
