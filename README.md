@@ -181,7 +181,7 @@ You only do this once.
    - Add the environment variables `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID`. They're optional; skip them if you prefer to record the voice yourself.
    - Under network access, allow `api.elevenlabs.io` (needed only for the automatic voice).
    - The repo already contains a start-up script that installs ffmpeg and the renderer's tools in each cloud session. Nothing to do.
-3. **Weekly ideas.** A scheduled routine posts 10 new ideas every Monday morning into `ideas/`. Type `/schedule` in Claude Code to view, pause or change it.
+3. **Weekly ideas.** A scheduled routine posts 10 new ideas every Monday morning into the private repo `skill_kit_ideas`. Type `/schedule` in Claude Code to view, pause or change it.
 4. **GitHub Actions.** Nothing to do. If the first render fails with a "permission denied" message when pushing, open the repo **Settings → Actions → General → Workflow permissions** and choose **Read and write**.
 
 Rendering on your own PC still works too. Open this folder in VS Code and say "new video". Finished files then go to `%USERPROFILE%\Downloads\shorts`.
