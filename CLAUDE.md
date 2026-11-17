@@ -4,7 +4,7 @@ You are making vertical (1080x1920, 30 fps) animated YouTube Shorts about invent
 
 ## Which mode am I in?
 - **Cloud mode**: the environment variable `CLAUDE_CODE_REMOTE` is `true` (Claude Code on the web or the phone app, or a scheduled routine). The repo is at `$CLAUDE_PROJECT_DIR`. Rendering happens in GitHub Actions, not in the session. Use `python3`.
-- **Local mode**: anything else (the user's Windows PC in VS Code). Root folder: `C:\Users\nuel.yosia\Downloads\skill_kit_main` (Git Bash: `/c/Users/nuel.yosia/Downloads/skill_kit_main`). Use Git Bash for `.sh` files and `python` (the `python3` command is a Windows Store stub).
+- **Local mode**: anything else (the user's Windows PC in VS Code). Root folder: `%USERPROFILE%\Downloads\skill_kit_main` (Git Bash: `~/Downloads/skill_kit_main`). Use Git Bash for `.sh` files and `python` (the `python3` command is a Windows Store stub).
 
 ## Fixed locations
 - `SKILL.md`: the full skill with all rules and stage details. READ IT AT THE START OF EVERY NEW VIDEO and follow it.
@@ -17,7 +17,7 @@ You are making vertical (1080x1920, 30 fps) animated YouTube Shorts about invent
 - `ideas/YYYY-MM-DD.md`: idea lists (written by the weekly routine or by you). `ideas/USED.md`: one line per idea already made.
 - `projects/<slug>/`: one working folder per video.
 - `.github/workflows/render.yml`: the cloud renderer, started by pushing `projects/<slug>/render.txt`.
-- Local only: **finished videos go to `C:\Users\nuel.yosia\Downloads\shorts`** (Git Bash: `/c/Users/nuel.yosia/Downloads/shorts`). Only final MP4s go there.
+- Local only: **finished videos go to `%USERPROFILE%\Downloads\shorts`** (Git Bash: `~/Downloads/shorts`). Only final MP4s go there.
 
 ## When the user says "ideas"
 Show the newest `ideas/*.md` list (numbered, with the Recommended pick), skipping anything in `ideas/USED.md`. If there is no list from the last 7 days, make a new one (step 1 below) and save it.
@@ -41,7 +41,7 @@ Do all of this yourself. Ask the user only at the two points marked USER.
    - **Local:** run `python mix.py voice.mp3 music.wav sfx.wav` after `python audio.py` (music must read -6.0 dB vs voice), render all frames in the background with progress checks, then `bash finish.sh "<slug>"`. Look at `out/qa_sheet.jpg` and fix frozen or black spans.
    - **Cloud:** run `audio.py` and `mix.py` once to check the levels (music -6.0 dB), then set `render.txt` to `mode: full` with the real `title:`, commit and push. GitHub Actions renders, mixes, encodes and publishes a Release. Tell the user it has started and roughly how long it takes (about 1-2 hours for 60 s). If the session is still open, poll `git pull` every 5-10 minutes for `out/RESULT.md` (success) or `out/STATUS.md` with FAILED. Then look at `out/qa_sheet.jpg`; if there are frozen or black spans, fix and push `render.txt` again.
 8. **Deliver.**
-   - **Local:** copy `projects/<slug>/out/<slug>.mp4` into `C:\Users\nuel.yosia\Downloads\shorts` as `<slug>.mp4`. Verify the copy exists and has the same size. Tell the user the full path.
+   - **Local:** copy `projects/<slug>/out/<slug>.mp4` into `%USERPROFILE%\Downloads\shorts` as `<slug>.mp4`. Verify the copy exists and has the same size. Tell the user the full path.
    - **Cloud:** give the Release link from `out/RESULT.md` (the MP4 downloads from there on a phone).
    - Both: give the length and one line per shot, and suggest the next idea from the list.
 

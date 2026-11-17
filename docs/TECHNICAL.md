@@ -29,7 +29,7 @@ You record the voiceover. The kit makes the rest: flat 2D bean-head characters i
 | `ideas/` | Weekly idea lists and `USED.md`. |
 | `projects/<slug>/` | One working folder per video. All building happens here. |
 
-Finished MP4s go to `C:\Users\nuel.yosia\Downloads\shorts`. That folder holds final videos only.
+Finished MP4s go to `%USERPROFILE%\Downloads\shorts`. That folder holds final videos only.
 
 ## Requirements
 
@@ -46,7 +46,7 @@ Use this if you want to run the steps yourself. Run the commands in Git Bash.
 
 ```bash
 # 1. Create a project (run from the root folder). This also installs Playwright in the project.
-cd /c/Users/nuel.yosia/Downloads/skill_kit_main
+cd ~/Downloads/skill_kit_main
 bash scripts/new-project.sh my-short
 cd projects/my-short
 
