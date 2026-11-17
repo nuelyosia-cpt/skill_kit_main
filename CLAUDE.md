@@ -7,7 +7,7 @@ You are making vertical (1080x1920, 30 fps) animated YouTube Shorts about invent
 - **Local mode**: anything else (the user's Windows PC in VS Code). Root folder: `%USERPROFILE%\Downloads\skill_kit_main` (Git Bash: `~/Downloads/skill_kit_main`). Use Git Bash for `.sh` files and `python` (the `python3` command is a Windows Store stub).
 
 ## Fixed locations
-- `SKILL.md`: the full skill with all rules and stage details. READ IT AT THE START OF EVERY NEW VIDEO and follow it.
+- The `cartoon-audio-short` skill (kept privately in the user's Claude account, not in this repo): the full skill with all rules and stage details. LOAD IT WITH THE SKILL TOOL AT THE START OF EVERY NEW VIDEO and follow it. Where it gives a kit location or `setup.sh` command, use this repo's `kit/` and `scripts/new-project.sh` instead. If the skill is not available, stop and tell the user to add it to their Claude account.
 - `kit/`: the original kit (engine, tools, example). Read-only: never edit it.
 - `scripts/new-project.sh <slug>`: creates `projects/<slug>/` with everything (engine, tools, `mix.py`, `finish.sh`, the stems-only `audio.py` template, `render.txt`). Use this instead of calling `kit/tools/setup.sh` directly.
 - `scripts/prepare-project.sh projects/<slug>`: restores the git-ignored generated files (three.js, `toon.js`, Playwright). Run it after a fresh clone.
@@ -25,16 +25,16 @@ Show the newest `ideas/*.md` list (numbered, with the Recommended pick), skippin
 ## When the user says "new video" (or gives a topic, or picks an idea number)
 Do all of this yourself. Ask the user only at the two points marked USER.
 
-1. **Ideas.** Follow SKILL.md stage 2. Web-search every idea's key facts first. Give exactly 10 numbered ideas with title, hook, eureka, twist, why it animates, and fact status (documented / anecdote / legend). Mark your single best pick as "Recommended". Save them as `ideas/<today>.md`. Use AskUserQuestion if available. Skip this step if the user already picked from a saved list.
+1. **Ideas.** Follow the skill's stage 2. Web-search every idea's key facts first. Give exactly 10 numbered ideas with title, hook, eureka, twist, why it animates, and fact status (documented / anecdote / legend). Mark your single best pick as "Recommended". Save them as `ideas/<today>.md`. Use AskUserQuestion if available. Skip this step if the user already picked from a saved list.
    **USER: picks a number** (or gives their own topic).
-2. **Script.** Follow SKILL.md stage 3. Target about 60 s: 200-215 words at the user's ElevenLabs voice (about 3.3 words per second). Say "supposedly" / "the story goes" for anything that is not documented. Run `bash scripts/new-project.sh <slug>`, save `projects/<slug>/script.txt`, add the idea to `ideas/USED.md`, show the script in chat with the word count. In cloud mode commit and push now, so the script is safe.
+2. **Script.** Follow the skill's stage 3. Target about 60 s: 200-215 words at the user's ElevenLabs voice (about 3.3 words per second). Say "supposedly" / "the story goes" for anything that is not documented. Run `bash scripts/new-project.sh <slug>`, save `projects/<slug>/script.txt`, add the idea to `ideas/USED.md`, show the script in chat with the word count. In cloud mode commit and push now, so the script is safe.
 3. **Voiceover.**
    - If `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` are set: run `python3 scripts/tts.py projects/<slug>` and tell the user the voice is done (length in seconds). No upload needed.
    - Otherwise tell the user to record it in ElevenLabs (no music, read exactly) and either upload `voice.mp3` here, or (from a phone) open the repo on github.com → `projects/<slug>/` → Add file → Upload files, commit to the branch you name, and then say "voice uploaded". In cloud mode, `git pull` to get it.
    **USER: supplies voice.mp3.** Never ask for the API key in chat.
-4. **Timing and plan.** In the project run `timing.py voice.mp3 script.txt --out work`, then write `work/PLAN.md` (SKILL.md stage 4.2). Set `TOTAL` in `web/story.js` to round(voice seconds × 30).
-5. **Build.** Write `web/story.js`, the world in `web/main.js`, outfits in `web/roman.js` (then `cat web/toonbase.js web/roman.js > web/toon.js`), and the cue table in `audio.py` (SKILL.md stages 4.3 to 4.7). Reuse cast and sets from earlier projects in `projects/` when useful.
-6. **Look check (SKILL.md 4.6).** Render stills and a contact sheet and LOOK at it, then fix problems. Do not wait for approval unless something is badly broken.
+4. **Timing and plan.** In the project run `timing.py voice.mp3 script.txt --out work`, then write `work/PLAN.md` (the skill's stage 4.2). Set `TOTAL` in `web/story.js` to round(voice seconds × 30).
+5. **Build.** Write `web/story.js`, the world in `web/main.js`, outfits in `web/roman.js` (then `cat web/toonbase.js web/roman.js > web/toon.js`), and the cue table in `audio.py` (the skill's stages 4.3 to 4.7). Reuse cast and sets from earlier projects in `projects/` when useful.
+6. **Look check (skill section 4.6).** Render stills and a contact sheet and LOOK at it, then fix problems. Do not wait for approval unless something is badly broken.
    - Local, or cloud when Chromium works: `node render.mjs stills/a "<frames>"` then `python sheet.py stills/a stills/sheet_a.jpg`.
    - Cloud when Chromium is missing: set `mode: stills` and `stills: <frames>` in `render.txt`, commit, push, then wait for `projects/<slug>/stills/sheet_ci.jpg` (poll with `git pull` about every 2 minutes; `out/STATUS.md` says if it failed).
 7. **Render and finish.**
@@ -53,7 +53,7 @@ Do all of this yourself. Ask the user only at the two points marked USER.
 ## Rules
 - Never edit or re-time the voice. The picture follows it.
 - Facts first. Never present a legend as fact. Dead historical people only as characters; nothing graphic or political.
-- Captions are always on: `finish.sh` burns them in from `work/words.json` (SKILL.md 4.9). Keep faces and key objects out of the caption band (y ≈ 1180-1420 px). Diegetic text must not be mirrored.
+- Captions are always on: `finish.sh` burns them in from `work/words.json` (skill section 4.9). Keep faces and key objects out of the caption band (y ≈ 1180-1420 px). Diegetic text must not be mirrored.
 - Never change files in `kit/`.
 - Mix only with `mix.py`.
 - Use a task list and keep progress updates short.

@@ -11,7 +11,7 @@ You record the voiceover. The kit makes the rest: flat 2D bean-head characters i
 | Path | What it is |
 |---|---|
 | [CLAUDE.md](../CLAUDE.md) | The automatic workflow Claude follows when you say "new video". |
-| [SKILL.md](../SKILL.md) | The full skill: idea rules, script formula, shot planning, the look, motion, sound, render and QA. |
+| `cartoon-audio-short` skill (private, in the Claude account) | The full skill: idea rules, script formula, shot planning, the look, motion, sound, render and QA. |
 | [mix.py](../mix.py) | Level-lock mixer. Puts the music at exactly -6 dB under the voice and caps the SFX. Copied into every project. |
 | [kit/](../kit/) | The original engine, tools and worked example. **Read-only: never edit it.** |
 | [kit/engine/](../kit/engine/) | Renderer (`main.js`), painted textures (`paint.js`), character drawing (`roman.js`), motion helpers (`motion.js`). |
@@ -107,7 +107,7 @@ Minutes: a 60 s video is about 1,800 frames. All jobs together use roughly 3-5 r
 - **Never edit or re-time the voice.** The picture follows the voice.
 - **Facts first.** Every story is labelled *documented*, *anecdote* or *legend*. Narration says "the story goes" for anything that is not documented.
 - Only dead historical people appear as characters. Nothing graphic or political.
-- Captions are always on, burned in by `finish.sh` from the word timings (see SKILL.md 4.9). Text inside the scene (signs, chalk diagrams, notebooks) must not be mirrored.
+- Captions are always on, burned in by `finish.sh` from the word timings (see skill section 4.9). Text inside the scene (signs, chalk diagrams, notebooks) must not be mirrored.
 - Always mix with `mix.py`, never by hand.
 - Never change files in `kit/`.
 

@@ -2,7 +2,7 @@
 
 Turn "eureka" stories (how inventions and discoveries really happened) into finished 60-second vertical cartoon Shorts. You make about three small decisions per video. Claude and GitHub do the rest, and you can do all of it from your phone.
 
-> Technical details (files, commands, the render workflow): [docs/TECHNICAL.md](docs/TECHNICAL.md). The rules Claude follows: [CLAUDE.md](CLAUDE.md) and [SKILL.md](SKILL.md).
+> Technical details (files, commands, the render workflow): [docs/TECHNICAL.md](docs/TECHNICAL.md). The rules Claude follows: [CLAUDE.md](CLAUDE.md) and the private `cartoon-audio-short` skill in the owner's Claude account.
 
 ---
 
