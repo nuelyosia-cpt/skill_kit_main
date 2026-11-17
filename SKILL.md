@@ -147,7 +147,7 @@ Rewrite the cue table for the story; the synths stay. `audio.py` writes only ste
 ### 4.8 Render + finish
 - Run `node render.mjs frames "0-<N-1>"` with Bash `run_in_background`, watched by a Monitor loop that reports progress and catches errors or process exit. `RESUME=1` continues after an interruption. Don't run heavy Python at the same time on small machines.
 - Run `bash finish.sh "<slug>"` (the project copy from `templates/finish.sh`, not the kit's). It builds and burns in the captions (4.9), applies one linear gain to about −14 LUFS plus a −1 dBFS peak limiter, encodes H.264 CRF 17 + AAC, runs freeze/black and loudness QA, prints `captions: ON (N events)`, and writes `out/qa_sheet.jpg`. Look at the sheet. Frozen spans ≥0.4 s, black frames, or `captions: OFF` need a fix.
-- Deliver the MP4 and a few lines on what each shot shows. Offer tweaks or the next idea from the list.
+- Deliver the MP4 and a few lines on what each shot shows, then the YouTube title and description (4.10). Offer tweaks or the next idea from the list.
 
 ### 4.9 Captions (always on)
 - Source: `work/words.json` from `timing.py` (word start/end times) plus `script.txt` for exact spelling. If the word counts match, the script's spelling is used; otherwise the timing file's. Never edit the voice to fit captions.
@@ -156,6 +156,19 @@ Rewrite the cue table for the story; the synths stay. `audio.py` writes only ste
 - Position: centred at x = 540, y = 1300. Options: `--y` (move the band), `--size` (default 104), `--words` (default 3), `--chars` (default 18). If a shot can't avoid the band, move the captions for the whole video rather than per shot, so they don't jump around.
 - Check: grab a frame from the middle of a sentence (`ffmpeg -ss <t> -i out/<slug>.mp4 -frames:v 1 check.jpg`) and look at it. The highlighted word must match what is being said at that moment. If the captions drift, fix `work/words.json` (or install faster-whisper and re-run `timing.py`); never shift the audio.
 - `CAPTIONS=0 bash finish.sh <slug>` turns captions off. Only use it if the user explicitly asks for a version without captions.
+
+### 4.10 YouTube title + description (after every finished video)
+Once the MP4 is rendered and checked, write `projects/<slug>/youtube.md` and show it in chat, ready to copy-paste:
+- **5 title options**, under 70 characters, with one marked **Recommended**. Lead with the paradox or the most surprising fact, not the name (e.g. "He Opened the Gates for 150,000 Enemies"). Vary the angles: paradox, number vs number, "most famous / craziest", a "why" question, name + hook. No clickbait that the video doesn't pay off, and never present a legend as fact in the title.
+- **Description** (copy-paste block):
+  1. A one-line hook (the problem in a few words, with an emoji or two).
+  2. Two or three sentences on the story: who, when and the eureka, plus why it matters.
+  3. A **📜 Fact check** line with the fact status from the idea list (documented / anecdote / legend) and where the story comes from.
+  4. A question to the viewer that invites comments.
+  5. 6-10 hashtags, starting with `#shorts`: the person, the field, the era, the place.
+- **Pinned comment**: one extra true fact that didn't fit in the script (a good place for a twist that was cut).
+- **Notes**: search tags, and any required voice credit (ElevenLabs free-plan audio needs an attribution line; check their current terms).
+Keep the tone the same as the script: curious, light and factual.
 
 ## Engine gotchas (kept in the kit; keep them if rebuilding)
 - `#include <fog_vertex>` / `<fog_fragment>` go on their own lines.

@@ -43,7 +43,7 @@ Do all of this yourself. Ask the user only at the two points marked USER.
 8. **Deliver.**
    - **Local:** copy `projects/<slug>/out/<slug>.mp4` into `C:\Users\nuel.yosia\Downloads\shorts` as `<slug>.mp4`. Verify the copy exists and has the same size. Tell the user the full path.
    - **Cloud:** give the Release link from `out/RESULT.md` (the MP4 downloads from there on a phone).
-   - Both: give the length and one line per shot, and suggest the next idea from the list.
+   - Both: give the length and one line per shot, then write `projects/<slug>/youtube.md` with 5 title options and a copy-paste description (SKILL.md 4.10) and show it in chat. Suggest the next idea from the list.
 
 ## Git in cloud mode
 - Commit code, `script.txt`, `voice.mp3`, `work/`, `render.txt` and small sheets. Never commit `frames/`, stills folders, WAV files or MP4s (`.gitignore` covers them).
