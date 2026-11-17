@@ -1,6 +1,6 @@
 # Cartoon shorts: automatic workflow
 
-You are making vertical (1080x1920, 30 fps) animated YouTube Shorts about inventors, inventions and "eureka" discovery stories.
+You are making vertical (1080x1920, 30 fps) animated YouTube Shorts about three themes: inventions and inventors, "big brain" moments (a genius idea and how it was executed: real, viral or from a famous story/myth), and famous characters' turning points. See the channel concept in the skill.
 
 ## Which mode am I in?
 - **Cloud mode**: the environment variable `CLAUDE_CODE_REMOTE` is `true` (Claude Code on the web or the phone app, or a scheduled routine). The repo is at `$CLAUDE_PROJECT_DIR`. Rendering happens in GitHub Actions, not in the session. Use `python3`.
@@ -25,7 +25,7 @@ Show the newest `ideas/*.md` list (numbered, with the Recommended pick), skippin
 ## When the user says "new video" (or gives a topic, or picks an idea number)
 Do all of this yourself. Ask the user only at the two points marked USER.
 
-1. **Ideas.** Follow the skill's stage 2. Web-search every idea's key facts first. Give exactly 10 numbered ideas with title, hook, eureka, twist, why it animates, and fact status (documented / anecdote / legend). Mark your single best pick as "Recommended". Save them as `ideas/<today>.md`. Use AskUserQuestion if available. Skip this step if the user already picked from a saved list.
+1. **Ideas.** Follow the skill's stage 2. Web-search every idea's key facts first. Give exactly 10 numbered ideas mixing the three themes (about 4 inventions, 3 big brain moments, 3 turning points unless the user asks for one theme), each with theme, title, hook, eureka / turning point, ending (twist, moral or engagement; the skill's stage 2), why it animates, and fact status (documented / anecdote / legend). Mark your single best pick as "Recommended". Save them as `ideas/<today>.md`. Use AskUserQuestion if available. Skip this step if the user already picked from a saved list.
    **USER: picks a number** (or gives their own topic).
 2. **Script.** Follow the skill's stage 3. Target about 60 s: 200-215 words at the user's ElevenLabs voice (about 3.3 words per second). Say "supposedly" / "the story goes" for anything that is not documented. Run `bash scripts/new-project.sh <slug>`, save `projects/<slug>/script.txt`, add the idea to `ideas/USED.md`, show the script in chat with the word count. In cloud mode commit and push now, so the script is safe.
 3. **Voiceover.**
@@ -43,7 +43,7 @@ Do all of this yourself. Ask the user only at the two points marked USER.
 8. **Deliver.**
    - **Local:** copy `projects/<slug>/out/<slug>.mp4` into `%USERPROFILE%\Downloads\shorts` as `<slug>.mp4`. Verify the copy exists and has the same size. Tell the user the full path.
    - **Cloud:** give the Release link from `out/RESULT.md` (the MP4 downloads from there on a phone).
-   - Both: give the length and one line per shot, and suggest the next idea from the list.
+   - Both: give the length and one line per shot, then write `projects/<slug>/youtube.md` with 5 title options and a copy-paste description (skill section 4.10) and show it in chat. Suggest the next idea from the list.
 
 ## Git in cloud mode
 - Commit code, `script.txt`, `voice.mp3`, `work/`, `render.txt` and small sheets. Never commit `frames/`, stills folders, WAV files or MP4s (`.gitignore` covers them).

@@ -1,0 +1,279 @@
+{
+ "duration": 62.92898,
+ "frames30": 1888,
+ "source": "silence-align (cost 1.64)",
+ "segments": [
+  [
+   0.29644,
+   1.76494
+  ],
+  [
+   2.01045,
+   3.84172
+  ],
+  [
+   4.46238,
+   6.70866
+  ],
+  [
+   6.96766,
+   8.43036
+  ],
+  [
+   8.64283,
+   9.73045
+  ],
+  [
+   10.3,
+   12.2874
+  ],
+  [
+   12.6161,
+   14.5473
+  ],
+  [
+   15.0943,
+   15.9757
+  ],
+  [
+   16.1351,
+   16.7645
+  ],
+  [
+   17.7568,
+   19.35
+  ],
+  [
+   19.7991,
+   21.2508
+  ],
+  [
+   21.6432,
+   24.1271
+  ],
+  [
+   24.5993,
+   24.9825
+  ],
+  [
+   25.137,
+   26.6268
+  ],
+  [
+   27.2051,
+   30.0783
+  ],
+  [
+   31.0596,
+   32.045
+  ],
+  [
+   32.3028,
+   34.6666
+  ],
+  [
+   35.085,
+   35.9505
+  ],
+  [
+   36.5053,
+   39.5435
+  ],
+  [
+   39.8822,
+   40.7113
+  ],
+  [
+   41.1847,
+   43.7078
+  ],
+  [
+   43.8516,
+   44.9732
+  ],
+  [
+   45.4097,
+   47.0193
+  ],
+  [
+   47.5226,
+   48.0783
+  ],
+  [
+   49.0796,
+   49.6032
+  ],
+  [
+   49.9493,
+   51.7124
+  ],
+  [
+   52.2215,
+   57.1126
+  ],
+  [
+   57.3911,
+   58.5766
+  ],
+  [
+   59.0896,
+   61.18
+  ],
+  [
+   61.6167,
+   62.3744
+  ]
+ ],
+ "phrases": [
+  {
+   "text": "The tallest building in the world,",
+   "s": 0.296,
+   "e": 1.765
+  },
+  {
+   "text": "and a man measured it without touching it.",
+   "s": 2.01,
+   "e": 3.842
+  },
+  {
+   "text": "It's around six hundred B. C.",
+   "s": 4.462,
+   "e": 6.709
+  },
+  {
+   "text": "Thales, a Greek thinker from Miletus,",
+   "s": 6.968,
+   "e": 8.43
+  },
+  {
+   "text": "travels to Egypt.",
+   "s": 8.643,
+   "e": 9.73
+  },
+  {
+   "text": "In front of him stands the Great Pyramid,",
+   "s": 10.3,
+   "e": 12.287
+  },
+  {
+   "text": "the tallest thing humans have ever built.",
+   "s": 12.616,
+   "e": 14.547
+  },
+  {
+   "text": "But how tall is it,",
+   "s": 15.094,
+   "e": 15.976
+  },
+  {
+   "text": "exactly?",
+   "s": 16.135,
+   "e": 16.765
+  },
+  {
+   "text": "You can't climb it with a tape measure.",
+   "s": 17.757,
+   "e": 19.35
+  },
+  {
+   "text": "You can't drop a rope from the top.",
+   "s": 19.799,
+   "e": 21.251
+  },
+  {
+   "text": "You'd need a very long ladder, and a lot of courage.",
+   "s": 21.643,
+   "e": 24.127
+  },
+  {
+   "text": "So,",
+   "s": 24.599,
+   "e": 24.983
+  },
+  {
+   "text": "the story goes, he waits.",
+   "s": 25.137,
+   "e": 26.627
+  },
+  {
+   "text": "He watches his own shadow shrink as the sun climbs higher.",
+   "s": 27.205,
+   "e": 30.078
+  },
+  {
+   "text": "Then, at one moment,",
+   "s": 31.06,
+   "e": 32.045
+  },
+  {
+   "text": "his shadow is exactly as long as he is tall.",
+   "s": 32.303,
+   "e": 34.667
+  },
+  {
+   "text": "And here's the trick.",
+   "s": 35.085,
+   "e": 35.95
+  },
+  {
+   "text": "If that's true for him, it's true for everything else, too.",
+   "s": 36.505,
+   "e": 39.544
+  },
+  {
+   "text": "Even the pyramid.",
+   "s": 39.882,
+   "e": 40.711
+  },
+  {
+   "text": "So right then, he measures the pyramid's shadow,",
+   "s": 41.185,
+   "e": 43.708
+  },
+  {
+   "text": "from its center to the tip.",
+   "s": 43.852,
+   "e": 44.973
+  },
+  {
+   "text": "That length is the pyramid's height.",
+   "s": 45.41,
+   "e": 47.019
+  },
+  {
+   "text": "No ladder.",
+   "s": 47.523,
+   "e": 48.078
+  },
+  {
+   "text": "No rope.",
+   "s": 49.08,
+   "e": 49.603
+  },
+  {
+   "text": "Just one shadow, and one idea.",
+   "s": 49.949,
+   "e": 51.712
+  },
+  {
+   "text": "Today, that same trick of comparing shadows and triangles still helps people measure trees,",
+   "s": 52.221,
+   "e": 57.113
+  },
+  {
+   "text": "towers and mountains.",
+   "s": 57.391,
+   "e": 58.577
+  },
+  {
+   "text": "Sometimes the answer isn't climbing higher.",
+   "s": 59.09,
+   "e": 61.18
+  },
+  {
+   "text": "It's looking down.",
+   "s": 61.617,
+   "e": 62.374
+  }
+ ]
+}
