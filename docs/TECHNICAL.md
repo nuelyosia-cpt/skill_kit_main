@@ -26,7 +26,7 @@ You record the voiceover. The kit makes the rest: flat 2D bean-head characters i
 | [assets/fonts/](../assets/fonts/) | Caption font (Luckiest Guy, Apache 2.0). |
 | [templates/audio.py](../templates/audio.py) | Music and SFX synths that write stems only. Length follows `voice.mp3`. |
 | [.github/workflows/render.yml](../.github/workflows/render.yml) | The cloud renderer (GitHub Actions). |
-| `ideas/` | Weekly idea lists and `USED.md`. |
+| `../skill_kit_ideas` (private repo) | Weekly idea lists and `USED.md`. Not in this repo. |
 | `projects/<slug>/` | One working folder per video. All building happens here. |
 
 Finished MP4s go to `%USERPROFILE%\Downloads\shorts`. That folder holds final videos only.
