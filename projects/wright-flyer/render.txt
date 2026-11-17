@@ -2,7 +2,7 @@
 # mode: stills  -> renders the frames listed in "stills" and commits stills/sheet_ci.jpg back
 # mode: full    -> renders the whole video, publishes the MP4 as a GitHub Release
 mode: stills
-title: post-it
+title: wright-flyer
 stills: 5,40,90,150
 # frames: 0-59     (optional: render only this range, for tests)
 # shards: 6        (optional: parallel render jobs, default 6)
