@@ -1,0 +1,326 @@
+{
+ "duration": 67.892245,
+ "frames30": 2037,
+ "source": "silence-align (cost 3.05)",
+ "segments": [
+  [
+   0.0,
+   1.74599
+  ],
+  [
+   1.87499,
+   3.07898
+  ],
+  [
+   3.75197,
+   4.94057
+  ],
+  [
+   5.17122,
+   7.33707
+  ],
+  [
+   7.53626,
+   8.41621
+  ],
+  [
+   8.70873,
+   10.5093
+  ],
+  [
+   10.9015,
+   12.2045
+  ],
+  [
+   12.4915,
+   13.9899
+  ],
+  [
+   14.6904,
+   16.0511
+  ],
+  [
+   16.7252,
+   17.3783
+  ],
+  [
+   17.7048,
+   18.9611
+  ],
+  [
+   19.1608,
+   20.6154
+  ],
+  [
+   20.9359,
+   21.851
+  ],
+  [
+   22.1282,
+   23.1862
+  ],
+  [
+   23.8086,
+   25.5075
+  ],
+  [
+   26.1937,
+   27.7538
+  ],
+  [
+   27.9469,
+   28.6826
+  ],
+  [
+   28.9823,
+   32.3204
+  ],
+  [
+   32.9943,
+   34.3385
+  ],
+  [
+   34.6621,
+   35.863
+  ],
+  [
+   36.2225,
+   37.6742
+  ],
+  [
+   38.3701,
+   38.7487
+  ],
+  [
+   38.8758,
+   40.8065
+  ],
+  [
+   41.0879,
+   42.1736
+  ],
+  [
+   42.4975,
+   43.3286
+  ],
+  [
+   43.583,
+   44.3309
+  ],
+  [
+   45.015,
+   46.2504
+  ],
+  [
+   46.9329,
+   48.684
+  ],
+  [
+   49.0229,
+   49.8702
+  ],
+  [
+   50.0927,
+   50.9942
+  ],
+  [
+   51.653,
+   52.1506
+  ],
+  [
+   52.3969,
+   55.941
+  ],
+  [
+   56.2038,
+   58.129
+  ],
+  [
+   58.7776,
+   60.9834
+  ],
+  [
+   61.5581,
+   62.6904
+  ],
+  [
+   63.3441,
+   63.9074
+  ],
+  [
+   64.0665,
+   64.9257
+  ],
+  [
+   65.1151,
+   67.6426
+  ]
+ ],
+ "phrases": [
+  {
+   "text": "How do you bring down a giant you can't even fight?",
+   "s": 0.0,
+   "e": 3.079
+  },
+  {
+   "text": "In Homer's ancient poem,",
+   "s": 3.752,
+   "e": 4.941
+  },
+  {
+   "text": "Odysseus and twelve men are trapped in a cave with Polyphemus,",
+   "s": 5.171,
+   "e": 8.416
+  },
+  {
+   "text": "a one-eyed giant as tall as a house.",
+   "s": 8.709,
+   "e": 10.509
+  },
+  {
+   "text": "The door is sealed with a boulder twenty-two wagons couldn't move.",
+   "s": 10.902,
+   "e": 13.99
+  },
+  {
+   "text": "And the sailors are dinner.",
+   "s": 14.69,
+   "e": 16.051
+  },
+  {
+   "text": "Here's the problem.",
+   "s": 16.725,
+   "e": 17.378
+  },
+  {
+   "text": "Even if they beat the giant,",
+   "s": 17.705,
+   "e": 18.961
+  },
+  {
+   "text": "nobody else could move that rock.",
+   "s": 19.161,
+   "e": 20.615
+  },
+  {
+   "text": "They need him alive,",
+   "s": 20.936,
+   "e": 21.851
+  },
+  {
+   "text": "to open the door for them.",
+   "s": 22.128,
+   "e": 23.186
+  },
+  {
+   "text": "So Odysseus makes a plan.",
+   "s": 23.809,
+   "e": 25.508
+  },
+  {
+   "text": "He sharpens a wooden stake and hides it.",
+   "s": 26.194,
+   "e": 28.683
+  },
+  {
+   "text": "Then he pours the giant strong wine until he's sleepy.",
+   "s": 28.982,
+   "e": 32.32
+  },
+  {
+   "text": "When the giant asks his name,",
+   "s": 32.994,
+   "e": 34.339
+  },
+  {
+   "text": "Odysseus is ready.",
+   "s": 34.662,
+   "e": 35.863
+  },
+  {
+   "text": "\"My name is Nobody.\"",
+   "s": 36.222,
+   "e": 37.674
+  },
+  {
+   "text": "That night,",
+   "s": 38.37,
+   "e": 38.749
+  },
+  {
+   "text": "they strike the giant's one eye with the stake.",
+   "s": 38.876,
+   "e": 40.806
+  },
+  {
+   "text": "He screams for help.",
+   "s": 41.088,
+   "e": 42.174
+  },
+  {
+   "text": "His neighbours shout,",
+   "s": 42.498,
+   "e": 43.329
+  },
+  {
+   "text": "\"Who's hurting you?\"",
+   "s": 43.583,
+   "e": 44.331
+  },
+  {
+   "text": "\"Nobody is hurting me!\"",
+   "s": 45.015,
+   "e": 46.25
+  },
+  {
+   "text": "So everyone goes back to bed.",
+   "s": 46.933,
+   "e": 48.684
+  },
+  {
+   "text": "A cry for help that says nothing.",
+   "s": 49.023,
+   "e": 50.994
+  },
+  {
+   "text": "At dawn,",
+   "s": 51.653,
+   "e": 52.151
+  },
+  {
+   "text": "the blind giant rolls the stone aside and feels every sheep that walks out.",
+   "s": 52.397,
+   "e": 55.941
+  },
+  {
+   "text": "But the men are clinging underneath their bellies.",
+   "s": 56.204,
+   "e": 58.129
+  },
+  {
+   "text": "The giant opens the door for them himself.",
+   "s": 58.778,
+   "e": 60.983
+  },
+  {
+   "text": "Brains beat size.",
+   "s": 61.558,
+   "e": 62.69
+  },
+  {
+   "text": "Although,",
+   "s": 63.344,
+   "e": 63.907
+  },
+  {
+   "text": "as we all know,",
+   "s": 64.067,
+   "e": 64.926
+  },
+  {
+   "text": "he would still make a mistake he'd regret in the end.",
+   "s": 65.115,
+   "e": 67.643
+  }
+ ]
+}

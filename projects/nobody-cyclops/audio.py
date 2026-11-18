@@ -52,12 +52,19 @@ midi = lambda m: 440 * 2 ** ((m - 69) / 12)
 
 # ---------------- music ----------------
 music = np.zeros(N, np.float32)
-BPM = 104; beat = 60 / BPM
-prog = [(57, [57, 60, 64]), (53, [53, 57, 60]), (55, [55, 59, 62]), (52, [52, 56, 59])]  # Am F G E
+BPM = 100; beat = 60 / BPM
+DOR = [57, 59, 60, 62, 64, 66, 67, 69, 71, 72]          # A dorian: sly, ancient-Greek feel (lyre)
+ROOTS = [45, 45, 43, 50]                               # A A G D
 def pluck(f, dur=0.35, bright=0.5):
     n = int(dur * SR); t = np.arange(n) / SR
     s = sum((bright ** k) * np.sin(2 * np.pi * f * (k + 1) * t) / (k + 1) for k in range(6))
     return (s * env(n, 0.003, dur * 0.35)).astype(np.float32)
+def lyre(f, dur=0.9, bend=0.0):
+    n = int(dur * SR); t = np.arange(n) / SR
+    fr = f * (1 + bend * (1 - np.exp(-t * 18)))
+    ph = 2 * np.pi * np.cumsum(fr) / SR
+    s = sum((0.55 ** k) * np.sin((k + 1) * ph) / (k + 1) ** 0.7 for k in range(8))
+    return (s * np.exp(-t * 3.2) * np.minimum(1, t / 0.002)).astype(np.float32)
 def brass(fs, dur):
     n = int(dur * SR); t = np.arange(n) / SR; s = np.zeros(n)
     for f in fs:
@@ -65,36 +72,41 @@ def brass(fs, dur):
         s += sum(np.sin((k + 1) * ph) / (k + 1) ** 1.3 for k in range(8))
     a = np.minimum(1, t / 0.08) * np.minimum(1, (dur - t) / 0.15).clip(0)
     return lp_fast((s * a).astype(np.float32), 1800) / len(fs)
-def drum(kind):
-    if kind == "kick":
-        n = int(0.35 * SR); t = np.arange(n) / SR; f = 50 + 90 * np.exp(-t * 30)
-        return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 9)).astype(np.float32)
-    n = int(0.18 * SR); t = np.arange(n) / SR
-    s = rng.standard_normal(n) * np.exp(-t * 28) * 0.6 + np.sin(2 * np.pi * 190 * t) * np.exp(-t * 20) * 0.5
-    return hp_fast(s.astype(np.float32), 300)
-
-MUSIC_END = 14.15  # music stops on "The bridge is not safe"
+def pad(fs, dur):
+    n = int(dur * SR); t = np.arange(n) / SR
+    s = sum(np.sin(2 * np.pi * f * t) + 0.3 * np.sin(2 * np.pi * 2 * f * t) for f in fs) / len(fs)
+    a = np.minimum(1, t / 0.6) * np.minimum(1, (dur - t) / 0.6).clip(0)
+    return (s * a).astype(np.float32)
+def doum():
+    n = int(0.45 * SR); t = np.arange(n) / SR; f = 62 + 60 * np.exp(-t * 25)
+    return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 8)).astype(np.float32)
+def tek():
+    n = int(0.08 * SR); t = np.arange(n) / SR
+    return (hp_fast((rng.standard_normal(n) * np.exp(-t * 90)).astype(np.float32), 2000) * 0.7 + np.sin(2 * np.pi * 1200 * t) * np.exp(-t * 70) * 0.3).astype(np.float32)
+NIGHT0, NIGHT1, STOP = 1149 / 30, 1406 / 30, 1983 / 30
+PAT = ["D", "t", "", "t", "D", "", "t", "t"]
+mel = [0, 2, 4, 3, 2, 0, 1, 2, 4, 5, 4, 2, 3, 1, 0, 0]
 bar = 0; tt = 0.0
-while tt < MUSIC_END:
-    root, ch = prog[bar % 4]
-    place(music, brass([midi(m) for m in ch], beat * 4 * 0.98), tt, 0.10)
-    for b in range(4):
-        tb = tt + b * beat
-        if tb >= MUSIC_END: break
-        place(music, drum("kick" if b % 2 == 0 else "snare"), tb, 0.55 if b % 2 == 0 else 0.32)
-        place(music, pluck(midi(root - 12), 0.4, 0.4), tb, 0.35)
-        place(music, pluck(midi(ch[(b + bar) % 3] + 12), 0.22, 0.6), tb + beat / 2, 0.13)
-    if bar % 2 == 1:  # little fanfare figure
-        for k, m in enumerate([ch[0] + 12, ch[1] + 12, ch[2] + 12]):
-            place(music, brass([midi(m)], beat * 0.45), tt + 2 * beat + k * beat * 0.5, 0.07)
+while tt < STOP - 0.1:
+    root = ROOTS[bar % 4]; night = NIGHT0 <= tt < NIGHT1; bright = tt >= 1547 / 30
+    place(music, pad([midi(root + 12), midi(root + 19)], beat * 4), tt, 0.05 if not night else 0.08)
+    for e8 in range(8):
+        te = tt + e8 * beat / 2
+        if te >= STOP - 0.1: break
+        if night:   # tense: no drums, slow low plucks only
+            if e8 in (0, 5): place(music, pluck(midi(root - 12), 0.8, 0.3), te, 0.25)
+            continue
+        if PAT[e8] == "D": place(music, doum(), te, 0.5)
+        elif PAT[e8] == "t": place(music, tek(), te, 0.14)
+        if e8 % 2 == 0: place(music, pluck(midi(root - 12), 0.5, 0.35), te, 0.2 if e8 == 0 else 0.11)
+        if e8 in (1, 3, 4, 6) or (bright and e8 == 7): place(music, lyre(midi(DOR[(mel[(bar * 4 + e8) % 16] + (bar // 4)) % 8] + (12 if bright and e8 == 7 else 0)), 0.7, 0.01), te, 0.13)
     bar += 1; tt += beat * 4
-# fade the bed at the stop
-i0 = int((MUSIC_END - 0.08) * SR); music[i0:] *= np.linspace(1, 0, N - i0) ** 8
-# tension drone from the sting to the end
-dn = int((DUR - MUSIC_END) * SR); td = np.arange(dn) / SR
-drone = (np.sin(2 * np.pi * 55 * td) + 0.5 * np.sin(2 * np.pi * 82.4 * td) + 0.3 * np.sin(2 * np.pi * 110.3 * td)) * np.minimum(1, td / 1.2)
-drone = lp_fast(drone.astype(np.float32), 600)
-place(music, drone, MUSIC_END, 0.09)
+# rising shimmer into "Nobody", warm chord on "Brains beat size"
+for k, m in enumerate([57, 64, 69, 73, 76]): place(music, lyre(midi(m), 2.2), 1847 / 30 + k * 0.05, 0.16)
+# the twist: music stops on "mistake", a low drone runs to the end
+i0 = int((STOP - 0.15) * SR); i1 = int(STOP * SR); music[i0:i1] *= np.linspace(1, 0, i1 - i0); music[i1:] = 0
+dn = N - i1; td = np.arange(dn) / SR
+music[i1:] += (np.sin(2 * np.pi * 55 * td) * 0.5 + np.sin(2 * np.pi * 55.6 * td) * 0.3 + np.sin(2 * np.pi * 82.4 * td) * 0.2) * np.minimum(1, td / 0.4) * 0.35
 
 # ---------------- sfx ----------------
 sfx = np.zeros(N, np.float32)
@@ -162,25 +174,77 @@ def water(d):
     return (lp_fast(noise(d), 900) * 0.5 + hp_fast(lp_fast(noise(d), 3000), 1200) * 0.15 * (0.6 + 0.4 * np.sin(2 * np.pi * 0.4 * t))).astype(np.float32)
 
 F = lambda f: f / 30
-place(sfx, whoosh(0.6), F(18), 0.5)            # hook camera pull-back
-place(sfx, leaves(2.2), F(62), 0.35)           # the years blow past
-place(sfx, thunk(85, 0.35), F(120), 1.0)       # spear stamp on "post"
-place(sfx, rumble(2.2), F(176), 0.9)           # empire collapses
-place(sfx, crash(1.4), F(186), 0.7)
-place(sfx, whoosh(0.5), F(196), 0.35)          # rack to the soldier
-place(sfx, cuckoo(), F(255), 0.35)             # "crazy"
-place(sfx, whoosh(0.4), F(276), 0.6)           # time jump flash
-for k in range(2): place(sfx, snore(1.15), F(286) + k * 1.45, 0.45)
-place(sfx, scrape(0.9), F(316), 0.6)           # helmet lifted
-place(sfx, ting(), F(392), 0.55)               # the carving glints
-place(sfx, sting(), 14.18, 0.85)               # "The bridge is not safe."
-place(sfx, creak(0.55, 120), F(464), 0.9); place(sfx, creak(0.5, 160), F(473), 0.7)
-place(sfx, whoosh(0.7), F(484), 0.5)           # crane under the deck
-place(sfx, water(DUR - F(484)), F(484), 0.35)
-place(sfx, creak(0.8, 90), F(536), 1.0)
-place(sfx, snap(), F(548), 0.9)                # brace breaks on "rotting"
-place(sfx, splash(1.0), F(580), 0.9)
+def boing():
+    n = int(0.5 * SR); t = np.arange(n) / SR; f = 520 * np.exp(-t * 3) + 120
+    return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 5)).astype(np.float32)
+def shimmer(d=1.6):
+    n = int(d * SR); t = np.arange(n) / SR; s = np.zeros(n)
+    for k, f0 in enumerate([880, 1320, 1760, 2200]): s += np.sin(2 * np.pi * np.cumsum(f0 * (1 + 0.6 * t / d)) / SR) * (0.5 + 0.5 * np.sin(2 * np.pi * (6 + k) * t))
+    return (s * (t / d) ** 2 * 0.25).astype(np.float32)
+def rustle(d=0.6):
+    x = hp_fast(lp_fast(noise(d), 5000), 1500); n = len(x); t = np.arange(n) / SR
+    return (x * (0.5 + 0.5 * np.abs(np.sin(2 * np.pi * 7 * t))) * np.minimum(1, (d - t) / 0.2)).astype(np.float32)
+def clang():
+    n = int(0.9 * SR); t = np.arange(n) / SR
+    return (sum(np.sin(2 * np.pi * f * t) * np.exp(-t * dk) for f, dk in [(620, 5), (1490, 7), (2310, 9)]) * 0.4).astype(np.float32)
+def whinny(d=1.0):
+    n = int(d * SR); t = np.arange(n) / SR; f = 700 + 300 * np.sin(2 * np.pi * 11 * t) * np.exp(-t * 2) - 300 * t / d
+    s = np.sin(2 * np.pi * np.cumsum(f) / SR) + 0.4 * np.sin(4 * np.pi * np.cumsum(f) / SR)
+    return lp_fast((s * env(n, 0.04, 0.4)).astype(np.float32), 2500) * 0.6
+def hoof():
+    n = int(0.12 * SR); t = np.arange(n) / SR
+    return (np.sin(2 * np.pi * 180 * t) * np.exp(-t * 60) + lp_fast(noise(0.12), 1500) * np.exp(-t * 50) * 0.5).astype(np.float32)
+def swish(d=0.35): x = hp_fast(lp_fast(noise(d), 4000), 600); t = np.arange(len(x)) / SR; return (x * np.sin(np.pi * t / d) ** 2 * 0.6).astype(np.float32)
+def pop(): n = int(0.12 * SR); t = np.arange(n) / SR; return (np.sin(2 * np.pi * np.cumsum(300 + 900 * t / 0.12) / SR) * np.exp(-t * 30)).astype(np.float32)
 
+def baa(d=0.7, f0=330):
+    n = int(d * SR); t = np.arange(n) / SR; f = f0 * (1 - 0.15 * t / d) * (1 + 0.04 * np.sin(2 * np.pi * 7 * t))
+    ph = np.cumsum(f) / SR; buzz = (np.mod(ph, 1) < 0.35).astype(np.float32) - 0.35
+    return lp_fast((buzz * env(n, 0.05, d * 0.5)).astype(np.float32), 2200) * 0.8
+def gulp():
+    n = int(0.3 * SR); t = np.arange(n) / SR; f = 160 + 220 * np.exp(-t * 18)
+    return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 12)).astype(np.float32)
+def crickets(d):
+    n = int(d * SR); t = np.arange(n) / SR
+    chirp = (np.sin(2 * np.pi * 30 * t) > 0.6) * (np.sin(2 * np.pi * 0.9 * t) > 0.2)
+    return (np.sin(2 * np.pi * 4200 * t) * chirp * 0.15).astype(np.float32)
+
+place(sfx, thunk(48, 0.6), F(2), 0.6)                     # hook boom
+place(sfx, whoosh(1.0), F(48), 0.45)                      # tilt up the giant
+place(sfx, thunk(60, 0.4), F(85), 0.55)                   # "fight"
+place(sfx, whoosh(0.4), F(106), 0.5); place(sfx, water(1.6), F(109), 0.35)   # flash to the sea
+place(sfx, baa(0.7), F(176), 0.4); place(sfx, baa(0.6, 290), F(196), 0.3)
+for k in range(4): place(sfx, thunk(55, 0.4), F(214 + k * 11), 0.55)   # the giant comes home
+place(sfx, pop(), F(267), 0.4)                            # the eye opens wide
+place(sfx, rumble(2.4), F(344), 0.7)                      # boulder rolls
+for k in range(22): place(sfx, pop(), F(379 + k), 0.12)   # 22 wagons pop up
+place(sfx, crash(1.0), F(414), 0.6); place(sfx, thunk(45, 0.6), F(414), 0.8)   # sealed on "move"
+place(sfx, gulp(), F(470), 0.5)                           # "dinner"
+for k in range(5): place(sfx, creak(0.4, 110 + k * 10), F(531 + k * 17), 0.4)   # pushing, nothing moves
+place(sfx, whoosh(0.5), F(632), 0.35)
+place(sfx, ting(), F(759), 0.45)                          # the plan
+place(sfx, scrape(1.3), F(793), 0.35); place(sfx, rustle(0.6), F(840), 0.45)   # whittle, hide
+place(sfx, water(1.0), F(886), 0.4); place(sfx, gulp(), F(920), 0.5); place(sfx, gulp(), F(932), 0.45)
+place(sfx, boing(), F(945), 0.35)                         # hic
+place(sfx, shimmer(1.6), F(1060), 0.5)                    # build to the name
+place(sfx, ting(), F(1108), 0.75)                         # EUREKA on "Nobody"
+place(sfx, snore(1.1), F(1150), 0.4)
+place(sfx, whoosh(0.4), F(1164), 0.4); place(sfx, sting(), F(1173), 0.5)      # strike (off-screen)
+place(sfx, rumble(1.0), F(1180), 0.5); place(sfx, rumble(0.8), F(1241), 0.5)  # the giant roars
+place(sfx, whoosh(0.5), F(1268), 0.35)
+place(sfx, pop(), F(1307), 0.4)                           # "?"
+place(sfx, rumble(1.2), F(1350), 0.45)                    # "Nobody is hurting me!"
+place(sfx, crickets(4.6), F(1407), 0.6)
+place(sfx, snore(1.2), F(1445), 0.3)
+place(sfx, pop(), F(1471), 0.45)                          # empty speech bubble
+place(sfx, rumble(1.4), F(1585), 0.55); place(sfx, thunk(50, 0.5), F(1615), 0.5)   # boulder rolls aside
+for k in range(4): place(sfx, baa(0.6, 300 + k * 20), F(1612 + k * 24), 0.3); place(sfx, thunk(200, 0.15), F(1640 + k * 24), 0.3)  # sheep and pats
+for k in range(14): place(sfx, hoof(), F(1765 + k * 6), 0.3)   # running to the ship
+place(sfx, ting(), F(1869), 0.45)                         # "size"
+place(sfx, water(3.5), F(1900), 0.35)
+place(sfx, whoosh(1.2), F(1950), 0.4)
+place(sfx, rumble(1.8), F(1983), 0.6); place(sfx, splash(1.5), F(2000), 0.5)  # the wave rises
+place(sfx, sting(), F(2018), 0.55)                        # "in the end"
 def write_stem(path, x):
     x = np.asarray(x, np.float32)
     peak = float(np.abs(x).max()) or 1.0
