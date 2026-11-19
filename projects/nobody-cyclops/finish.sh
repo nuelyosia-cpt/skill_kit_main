@@ -2,6 +2,9 @@
 # Encode frames + mix -> mp4 with burned-in captions, then QA.   bash finish.sh "<slug>"
 # Same as kit/tools/finish.sh plus captions: builds work/captions.ass from work/words.json
 # (scripts/captions.py) and burns it in with the bundled font. CAPTIONS=0 turns them off.
+# Thumbnail frame: if out/thumb_9x16.jpg exists, it covers the first THUMB_SEC seconds (default 0.33 s,
+# 10 frames) on top of everything, so it can be picked as the Short's cover in YouTube. THUMB_SEC=0 turns it off.
+# The audio and the voice timing are untouched (the image is overlaid, nothing is inserted).
 set -e; T="${1:-short}"; F="out/${T// /-}.mp4"; mkdir -p out
 PY=python3; $PY -c 1 2>/dev/null || PY=python
 ROOT="$(cd ../.. && pwd)"
@@ -13,7 +16,16 @@ if [ "${CAPTIONS:-1}" != "0" ]; then
   VF="ass=work/captions.ass:fontsdir=fonts"
 fi
 ffmpeg -v error -y -i mix_raw.wav -af "loudnorm=I=-14:TP=-1.5:LRA=7" -ar 48000 -ac 2 mix.wav
-ffmpeg -v error -y -framerate 30 -i frames/f%04d.jpg -i mix.wav -map 0:v:0 -map 1:a:0 -vf "$VF" -c:v libx264 -preset slow -crf 17 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest -movflags +faststart "$F"
+TS="${THUMB_SEC:-0.33}"
+if [ -f out/thumb_9x16.jpg ] && [ "$TS" != "0" ]; then
+  ffmpeg -v error -y -framerate 30 -i frames/f%04d.jpg -i mix.wav -loop 1 -framerate 30 -t "$TS" -i out/thumb_9x16.jpg \
+    -filter_complex "[0:v]$VF[v0];[2:v]scale=1080:1920,setsar=1[t];[v0][t]overlay=0:0:eof_action=pass:enable='lt(t,$TS)'[v]" \
+    -map "[v]" -map 1:a:0 -c:v libx264 -preset slow -crf 17 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest -movflags +faststart "$F"
+  echo "thumbnail frame: ON (first ${TS}s)"
+else
+  ffmpeg -v error -y -framerate 30 -i frames/f%04d.jpg -i mix.wav -map 0:v:0 -map 1:a:0 -vf "$VF" -c:v libx264 -preset slow -crf 17 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest -movflags +faststart "$F"
+  echo "thumbnail frame: OFF (no out/thumb_9x16.jpg)"
+fi
 ffprobe -v error -show_entries format=duration -show_entries stream=width,height,r_frame_rate -of compact "$F"
 echo "--- QA (empty = no black/frozen spans)"; ffmpeg -i "$F" -vf "freezedetect=n=0.0005:d=0.4,blackdetect=d=0.05" -an -f null - 2>&1 | grep -E "freeze_start|black_start" || true
 ffmpeg -i "$F" -af ebur128 -f null - 2>&1 | grep -E "^\s+I:" | tail -1

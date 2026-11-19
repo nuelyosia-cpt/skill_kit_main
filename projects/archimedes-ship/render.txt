@@ -14,3 +14,4 @@ stills: 5,40,90,150
 thumb: 1835
 thumb_text: ONE MAN VS A *WHOLE SHIP*
 thumb_focus: 0.5
+# re-render 2: thumbnail on the opening frames
