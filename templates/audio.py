@@ -77,9 +77,9 @@ def drum(kind):
 
 from music import bed, STYLES   # calm music library (see music.py for styles and moods)
 # One calm bed per video. Change STYLE / MOOD / SEED every video so no two shorts sound alike:
-#   STYLE: harp, lyre, piano, musicbox, marimba, strings, guitar, kalimba
-#   MOOD:  curious, warm, mystery, epic
-STYLE, MOOD, SEED = "piano", "mystery", 3
+#   STYLE: lofi, chillhop, explainer, synthwave, cinematic, trap
+#   MOOD:  dreamy, curious, mystery, epic
+STYLE, MOOD, SEED = "cinematic", "mystery", 3
 MUSIC_END = 14.15  # twist ending: the music stops on "The bridge is not safe" (use resolve= for a moral/engagement ending)
 music = bed(DUR, style=STYLE, mood=MOOD, seed=SEED,
             sections=[(0, "soft"), (5.0, "normal"), (11.0, "tense")],   # (seconds, rest|soft|normal|tense)
