@@ -1,8 +1,10 @@
 """Synthesized music bed + SFX stems.  python audio.py  ->  music.wav + sfx.wav
 
-Template from the soldier example. Rewrite the music section and the SFX cue table
-for each story; keep the synths. This script ONLY writes stems: mix.py does the mix
-(music at -6 dB vs voice, SFX at or below that). No ducking, no compression here.
+Rewrite the MUSIC settings and the SFX cue table for each story; keep the synths.
+Music: a calm bed from music.py (pick a STYLE/MOOD/SEED different from the last videos).
+SFX: follow the picture: one cue for every visible action (a door, a splash, a pop-up,
+a step, a camera whoosh), timed to the frame it happens on. This script ONLY writes
+stems: mix.py does the mix (music -12 dB under the voice, SFX -8 dB). No ducking here.
 Length always follows voice.mp3, so the picture and the sound stay locked to the voice.
 """
 import numpy as np, subprocess, wave
@@ -73,28 +75,16 @@ def drum(kind):
     s = rng.standard_normal(n) * np.exp(-t * 28) * 0.6 + np.sin(2 * np.pi * 190 * t) * np.exp(-t * 20) * 0.5
     return hp_fast(s.astype(np.float32), 300)
 
-MUSIC_END = 14.15  # music stops on "The bridge is not safe"
-bar = 0; tt = 0.0
-while tt < MUSIC_END:
-    root, ch = prog[bar % 4]
-    place(music, brass([midi(m) for m in ch], beat * 4 * 0.98), tt, 0.10)
-    for b in range(4):
-        tb = tt + b * beat
-        if tb >= MUSIC_END: break
-        place(music, drum("kick" if b % 2 == 0 else "snare"), tb, 0.55 if b % 2 == 0 else 0.32)
-        place(music, pluck(midi(root - 12), 0.4, 0.4), tb, 0.35)
-        place(music, pluck(midi(ch[(b + bar) % 3] + 12), 0.22, 0.6), tb + beat / 2, 0.13)
-    if bar % 2 == 1:  # little fanfare figure
-        for k, m in enumerate([ch[0] + 12, ch[1] + 12, ch[2] + 12]):
-            place(music, brass([midi(m)], beat * 0.45), tt + 2 * beat + k * beat * 0.5, 0.07)
-    bar += 1; tt += beat * 4
-# fade the bed at the stop
-i0 = int((MUSIC_END - 0.08) * SR); music[i0:] *= np.linspace(1, 0, N - i0) ** 8
-# tension drone from the sting to the end
-dn = int((DUR - MUSIC_END) * SR); td = np.arange(dn) / SR
-drone = (np.sin(2 * np.pi * 55 * td) + 0.5 * np.sin(2 * np.pi * 82.4 * td) + 0.3 * np.sin(2 * np.pi * 110.3 * td)) * np.minimum(1, td / 1.2)
-drone = lp_fast(drone.astype(np.float32), 600)
-place(music, drone, MUSIC_END, 0.09)
+from music import bed, STYLES   # calm music library (see music.py for styles and moods)
+# One calm bed per video. Change STYLE / MOOD / SEED every video so no two shorts sound alike:
+#   STYLE: harp, lyre, piano, musicbox, marimba, strings, guitar, kalimba
+#   MOOD:  curious, warm, mystery, epic
+STYLE, MOOD, SEED = "piano", "mystery", 3
+MUSIC_END = 14.15  # twist ending: the music stops on "The bridge is not safe" (use resolve= for a moral/engagement ending)
+music = bed(DUR, style=STYLE, mood=MOOD, seed=SEED,
+            sections=[(0, "soft"), (5.0, "normal"), (11.0, "tense")],   # (seconds, rest|soft|normal|tense)
+            swell=[], stop=MUSIC_END, resolve=None)[:N]
+music = np.pad(music, (0, max(0, N - len(music))))
 
 # ---------------- sfx ----------------
 sfx = np.zeros(N, np.float32)

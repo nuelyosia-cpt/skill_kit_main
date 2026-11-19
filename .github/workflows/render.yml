@@ -125,6 +125,13 @@ jobs:
           python mix.py voice.mp3 music.wav sfx.wav 2>&1 | tee -a out/ci.log
           bash finish.sh "$SLUG" 2>&1 | tee -a out/ci.log
           test -s "out/$SLUG.mp4"
+          # thumbnail from a caption-free frame (render.txt: thumb, thumb_text, thumb_circle, thumb_focus)
+          get() { grep -E "^$1:" render.txt | head -1 | sed -E "s/^$1:[[:space:]]*//; s/[[:space:]]+$//" || true; }
+          TF=$(get thumb); TT=$(get thumb_text); TC=$(get thumb_circle); TFO=$(get thumb_focus)
+          if [ -n "$TF" ] && [ -n "$TT" ]; then
+            FR="frames/f$(printf %04d "$TF").jpg"
+            python ../../scripts/thumbnail.py "$FR" "$TT" out/thumb ${TC:+--circle "$TC"} ${TFO:+--focus "$TFO"} --font ../../assets/fonts/LuckiestGuy-Regular.ttf 2>&1 | tee -a out/ci.log
+          else echo "thumbnail: skipped (no thumb/thumb_text in render.txt)" | tee -a out/ci.log; fi
       - name: Publish release
         id: rel
         if: needs.prep.outputs.release != 'no'
@@ -137,6 +144,8 @@ jobs:
           files: |
             ${{ env.P }}/out/${{ env.SLUG }}.mp4
             ${{ env.P }}/out/qa_sheet.jpg
+            ${{ env.P }}/out/thumb_9x16.jpg
+            ${{ env.P }}/out/thumb_16x9.jpg
       - uses: actions/upload-artifact@v4
         with: { name: "${{ env.SLUG }}-mp4", path: "${{ env.P }}/out/${{ env.SLUG }}.mp4", retention-days: 14 }
       - name: Commit result back
@@ -150,7 +159,8 @@ jobs:
             echo "## Mix and QA log"; echo; echo '```'; cat "$O/ci.log"; echo '```'
           } > "$O/RESULT.md"
           bash scripts/ci/status.sh "$SLUG" "done" finish
-          bash scripts/ci/commit-back.sh "render-bot: $SLUG rendered" "$O/RESULT.md" "$O/qa_sheet.jpg" "$O/STATUS.md"
+          THUMBS=$(ls "$O"/thumb_*.jpg 2>/dev/null || true)
+          bash scripts/ci/commit-back.sh "render-bot: $SLUG rendered" "$O/RESULT.md" "$O/qa_sheet.jpg" "$O/STATUS.md" $THUMBS
       - name: Report failure
         if: failure()
         run: |
