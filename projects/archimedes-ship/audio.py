@@ -79,11 +79,11 @@ from music import bed, STYLES   # calm music library (see music.py for styles an
 # One calm bed per video. Change STYLE / MOOD / SEED every video so no two shorts sound alike:
 #   STYLE: lofi, chillhop, explainer, synthwave, cinematic, trap
 #   MOOD:  dreamy, curious, mystery, epic
-STYLE, MOOD, SEED = "cinematic", "mystery", 3
-MUSIC_END = 14.15  # twist ending: the music stops on "The bridge is not safe" (use resolve= for a moral/engagement ending)
+STYLE, MOOD, SEED = "explainer", "curious", 5
 music = bed(DUR, style=STYLE, mood=MOOD, seed=SEED,
-            sections=[(0, "soft"), (5.0, "normal"), (11.0, "tense")],   # (seconds, rest|soft|normal|tense)
-            swell=[], stop=MUSIC_END, resolve=None)[:N]
+            sections=[(0, "soft"), (3.1, "normal"), (34.8, "soft"), (37.5, "normal"), (42.6, "rest"), (43.6, "normal"),
+                      (52.9, "soft"), (57.3, "normal")],
+            swell=[43.1], stop=None, resolve=69.5)[:N]
 music = np.pad(music, (0, max(0, N - len(music))))
 
 # ---------------- sfx ----------------
@@ -152,25 +152,61 @@ def water(d):
     return (lp_fast(noise(d), 900) * 0.5 + hp_fast(lp_fast(noise(d), 3000), 1200) * 0.15 * (0.6 + 0.4 * np.sin(2 * np.pi * 0.4 * t))).astype(np.float32)
 
 F = lambda f: f / 30
-place(sfx, whoosh(0.6), F(18), 0.5)            # hook camera pull-back
-place(sfx, leaves(2.2), F(62), 0.35)           # the years blow past
-place(sfx, thunk(85, 0.35), F(120), 1.0)       # spear stamp on "post"
-place(sfx, rumble(2.2), F(176), 0.9)           # empire collapses
-place(sfx, crash(1.4), F(186), 0.7)
-place(sfx, whoosh(0.5), F(196), 0.35)          # rack to the soldier
-place(sfx, cuckoo(), F(255), 0.35)             # "crazy"
-place(sfx, whoosh(0.4), F(276), 0.6)           # time jump flash
-for k in range(2): place(sfx, snore(1.15), F(286) + k * 1.45, 0.45)
-place(sfx, scrape(0.9), F(316), 0.6)           # helmet lifted
-place(sfx, ting(), F(392), 0.55)               # the carving glints
-place(sfx, sting(), 14.18, 0.85)               # "The bridge is not safe."
-place(sfx, creak(0.55, 120), F(464), 0.9); place(sfx, creak(0.5, 160), F(473), 0.7)
-place(sfx, whoosh(0.7), F(484), 0.5)           # crane under the deck
-place(sfx, water(DUR - F(484)), F(484), 0.35)
-place(sfx, creak(0.8, 90), F(536), 1.0)
-place(sfx, snap(), F(548), 0.9)                # brace breaks on "rotting"
-place(sfx, splash(1.0), F(580), 0.9)
+def pop(): n = int(0.12 * SR); t = np.arange(n) / SR; return (np.sin(2 * np.pi * np.cumsum(300 + 900 * t / 0.12) / SR) * np.exp(-t * 30)).astype(np.float32)
+def boing():
+    n = int(0.5 * SR); t = np.arange(n) / SR; f = 520 * np.exp(-t * 3) + 120
+    return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 5)).astype(np.float32)
+def scratch(d=0.6):   # quill on parchment
+    n = int(d * SR); t = np.arange(n) / SR
+    return (hp_fast(noise(d), 2500) * (0.4 + 0.6 * (np.sin(2 * np.pi * 9 * t) > 0)) * np.sin(np.pi * t / d) * 0.4).astype(np.float32)
+def clack(): n = int(0.1 * SR); t = np.arange(n) / SR; return (np.sin(2 * np.pi * 900 * t) * np.exp(-t * 70) + hp_fast(noise(0.1), 1500) * np.exp(-t * 90) * 0.4).astype(np.float32)
+def tick(): n = int(0.06 * SR); t = np.arange(n) / SR; return (np.sin(2 * np.pi * 2400 * t) * np.exp(-t * 80)).astype(np.float32)
+def gulls(d):
+    out = np.zeros(int(d * SR), np.float32)
+    for k in range(int(d / 1.6)):
+        n = int(0.35 * SR); t = np.arange(n) / SR; f = 1500 - 500 * t / 0.35
+        place_local = int((0.3 + k * 1.6 + rng.uniform(0, 0.5)) * SR)
+        sig = (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.sin(np.pi * t / 0.35) * 0.3).astype(np.float32)
+        out[place_local:place_local + n] += sig[: max(0, len(out) - place_local)]
+    return out
+def crowd(d): return (lp_fast(noise(d), 900) * 0.4 * np.minimum(1, np.arange(int(d * SR)) / SR / 0.4)).astype(np.float32)
 
+# --- cues follow the picture (frames / 30) ---
+place(sfx, whoosh(1.0), F(0), 0.35)                       # drift through space
+for k in range(3): place(sfx, creak(0.4, 120 + k * 15), F(46 + k * 6), 0.45)   # leaning on the lever
+place(sfx, boing(), F(56), 0.4); place(sfx, ting(), F(60), 0.3)                  # the Earth wobbles up
+place(sfx, pop(), F(124), 0.4)                            # the king points: "prove it"
+place(sfx, whoosh(0.4), F(158), 0.45); place(sfx, water(5.0), F(161), 0.35); place(sfx, gulls(5.0), F(161), 0.5)   # flash to Syracuse
+place(sfx, pop(), F(225), 0.45)                           # SYRACUSE title
+place(sfx, whoosh(0.3), F(314), 0.3); place(sfx, scratch(2.0), F(322), 0.6)    # study, quill
+place(sfx, rustle(0.6) if 'rustle' in dir() else scratch(0.5), F(390), 0.4)  # the king opens the letter
+place(sfx, pop(), F(432), 0.45); place(sfx, pop(), F(522), 0.45)               # diagram cards
+place(sfx, pop(), F(650), 0.35)                           # the king points to the harbour
+place(sfx, whoosh(0.4), F(672), 0.4); place(sfx, water(8.0), F(675), 0.3)
+for k in range(8): place(sfx, creak(0.5, 100 + (k % 3) * 20), F(690 + k * 18), 0.45)   # hauling ropes
+for k in range(6): place(sfx, thunk(160, 0.2), F(842 + k * 8), 0.35)            # crates and passengers on board
+place(sfx, crowd(3.4), F(842), 0.5)
+for k in range(4): place(sfx, creak(0.5, 90 + k * 12), F(920 + k * 12), 0.5)    # sailors strain
+place(sfx, thunk(70, 0.4), F(945), 0.6)                   # nothing moves
+place(sfx, whoosh(0.6), F(996), 0.35)                     # pull back to one man
+place(sfx, boing(), F(1076), 0.35); place(sfx, pop(), F(1087), 0.5)              # skinny arm, "no muscle"
+for k in range(10): place(sfx, clack(), F(1147 + k * 11.5), 0.35); place(sfx, whoosh(0.15), F(1147 + k * 11.5), 0.2)   # rope runs through the pulleys
+place(sfx, ting(), F(1298), 0.7)                          # EUREKA on "trick"
+place(sfx, pop(), F(1306), 0.4)                           # the diagram appears
+for k in range(10): place(sfx, tick(), F(1328 + k * 3.4), 0.45)                  # strands light up one by one
+for k in range(10): place(sfx, tick(), F(1372 + k * 7), 0.3)                     # 1/10 labels
+place(sfx, ting(), F(1441), 0.5)                          # "a tenth"
+place(sfx, whoosh(0.7), F(1479), 0.35); place(sfx, pop(), F(1538), 0.45)        # x10 rope, /10 force
+place(sfx, whoosh(0.4), F(1588), 0.35); place(sfx, creak(0.4, 140), F(1608), 0.5)   # sits down
+place(sfx, creak(0.6, 110), F(1680), 0.35)                # gentle pull
+place(sfx, scrape(3.6), F(1730), 0.5); place(sfx, rumble(3.4), F(1730), 0.4)    # the ship glides over the sand
+place(sfx, crowd(2.6), F(1760), 0.6)                      # the crowd gasps
+place(sfx, whoosh(0.4), F(1842), 0.45)                    # flash to today
+place(sfx, pop(), F(1862), 0.4); place(sfx, pop(), F(1886), 0.4); place(sfx, pop(), F(1925), 0.4)
+place(sfx, creak(1.2, 70), F(1862), 0.3)                  # crane winch
+place(sfx, rumble(2.4), F(1925), 0.3)                     # truck engine
+place(sfx, whoosh(0.4), F(2004), 0.4)                     # back to the beach
+place(sfx, ting(), F(2084), 0.45)                         # wink on "ship"
 def write_stem(path, x):
     x = np.asarray(x, np.float32)
     peak = float(np.abs(x).max()) or 1.0

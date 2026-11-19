@@ -1,8 +1,8 @@
 # Render request. Pushing a change to this file starts the GitHub Actions render.
-# mode: stills  -> renders the frames listed in "stills" and commits stills/sheet_ci.jpg back
+# mode: full  -> renders the frames listed in "stills" and commits stills/sheet_ci.jpg back
 # mode: full    -> renders the whole video, publishes the MP4 as a GitHub Release
-mode: stills
-title: archimedes-ship
+mode: full
+title: The Man Who Pulled a Ship With One Hand
 stills: 5,40,90,150
 # frames: 0-59     (optional: render only this range, for tests)
 # shards: 6        (optional: parallel render jobs, default 6)
@@ -11,3 +11,6 @@ stills: 5,40,90,150
 # thumb_text: HE BEAT A GIANT WITH ONE *WORD*   (*stars* = yellow)
 # thumb_circle: 540,840,120   (optional red ring, 1080x1920 coords)
 # thumb_focus: 0.4            (optional, vertical centre for the 16:9 version)
+thumb: 1835
+thumb_text: ONE MAN VS A *WHOLE SHIP*
+thumb_focus: 0.5

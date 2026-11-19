@@ -1,0 +1,341 @@
+{
+ "duration": 69.851429,
+ "frames30": 2096,
+ "source": "silence-align (cost 4.03)",
+ "segments": [
+  [
+   0.150952,
+   2.74104
+  ],
+  [
+   3.15685,
+   4.03054
+  ],
+  [
+   4.23156,
+   4.71
+  ],
+  [
+   5.38546,
+   6.37186
+  ],
+  [
+   6.74224,
+   8.07048
+  ],
+  [
+   8.45921,
+   9.89472
+  ],
+  [
+   10.5785,
+   12.2606
+  ],
+  [
+   12.9107,
+   13.9924
+  ],
+  [
+   14.404,
+   16.7639
+  ],
+  [
+   17.4014,
+   18.9226
+  ],
+  [
+   19.3253,
+   20.1696
+  ],
+  [
+   20.8776,
+   22.0908
+  ],
+  [
+   22.4997,
+   24.2484
+  ],
+  [
+   24.5297,
+   25.4174
+  ],
+  [
+   25.7585,
+   27.6968
+  ],
+  [
+   28.0767,
+   29.8514
+  ],
+  [
+   30.5278,
+   32.0879
+  ],
+  [
+   32.5722,
+   34.1862
+  ],
+  [
+   34.7918,
+   35.0255
+  ],
+  [
+   35.3372,
+   36.9607
+  ],
+  [
+   37.5869,
+   40.4832
+  ],
+  [
+   40.7082,
+   41.3296
+  ],
+  [
+   41.6204,
+   42.3946
+  ],
+  [
+   42.7694,
+   43.4387
+  ],
+  [
+   43.7243,
+   45.5155
+  ],
+  [
+   45.7387,
+   46.6001
+  ],
+  [
+   46.7854,
+   48.2397
+  ],
+  [
+   48.916,
+   50.6827
+  ],
+  [
+   51.1104,
+   52.2876
+  ],
+  [
+   52.9933,
+   54.3368
+  ],
+  [
+   54.7548,
+   55.3827
+  ],
+  [
+   55.8844,
+   56.7205
+  ],
+  [
+   57.4377,
+   59.9847
+  ],
+  [
+   60.3999,
+   62.1938
+  ],
+  [
+   62.8834,
+   64.8842
+  ],
+  [
+   65.1871,
+   66.2453
+  ],
+  [
+   66.8733,
+   67.9503
+  ],
+  [
+   68.2741,
+   69.6243
+  ]
+ ],
+ "phrases": [
+  {
+   "text": "Archimedes once claimed he could move the whole Earth.",
+   "s": 0.151,
+   "e": 2.741
+  },
+  {
+   "text": "So the king said:",
+   "s": 3.157,
+   "e": 4.031
+  },
+  {
+   "text": "prove it.",
+   "s": 4.232,
+   "e": 4.71
+  },
+  {
+   "text": "The story goes,",
+   "s": 5.385,
+   "e": 6.372
+  },
+  {
+   "text": "it happened in Syracuse,",
+   "s": 6.742,
+   "e": 8.07
+  },
+  {
+   "text": "over two thousand years ago.",
+   "s": 8.459,
+   "e": 9.895
+  },
+  {
+   "text": "Archimedes wrote to King Hiero:",
+   "s": 10.579,
+   "e": 12.261
+  },
+  {
+   "text": "with the right machine,",
+   "s": 12.911,
+   "e": 13.992
+  },
+  {
+   "text": "any weight can be moved by a small force.",
+   "s": 14.404,
+   "e": 16.764
+  },
+  {
+   "text": "Give me another world to stand on,",
+   "s": 17.401,
+   "e": 18.923
+  },
+  {
+   "text": "and I'll move this one.",
+   "s": 19.325,
+   "e": 20.17
+  },
+  {
+   "text": "The king had a better test.",
+   "s": 20.878,
+   "e": 22.091
+  },
+  {
+   "text": "He picked one of the biggest ships in his navy,",
+   "s": 22.5,
+   "e": 24.248
+  },
+  {
+   "text": "with three masts,",
+   "s": 24.53,
+   "e": 25.417
+  },
+  {
+   "text": "dragged up onto the beach by crowds of men.",
+   "s": 25.759,
+   "e": 27.697
+  },
+  {
+   "text": "Then he filled it with cargo and passengers.",
+   "s": 28.077,
+   "e": 29.851
+  },
+  {
+   "text": "Dozens of sailors couldn't budge it.",
+   "s": 30.528,
+   "e": 32.088
+  },
+  {
+   "text": "And Archimedes was just one man.",
+   "s": 32.572,
+   "e": 34.186
+  },
+  {
+   "text": "So he didn't use muscle.",
+   "s": 34.792,
+   "e": 36.961
+  },
+  {
+   "text": "He used rope. He ran one rope around a set of wheels called pulleys,",
+   "s": 37.587,
+   "e": 40.483
+  },
+  {
+   "text": "back and forth,",
+   "s": 40.708,
+   "e": 41.33
+  },
+  {
+   "text": "again and again.",
+   "s": 41.62,
+   "e": 42.395
+  },
+  {
+   "text": "Here's the trick.",
+   "s": 42.769,
+   "e": 43.439
+  },
+  {
+   "text": "Every loop of rope shares the weight.",
+   "s": 43.724,
+   "e": 45.516
+  },
+  {
+   "text": "With ten loops,",
+   "s": 45.739,
+   "e": 46.6
+  },
+  {
+   "text": "each one holds only a tenth.",
+   "s": 46.785,
+   "e": 48.24
+  },
+  {
+   "text": "He has to pull ten times more rope,",
+   "s": 48.916,
+   "e": 50.683
+  },
+  {
+   "text": "but with a tenth of the strength.",
+   "s": 51.11,
+   "e": 52.288
+  },
+  {
+   "text": "Then Archimedes sat down,",
+   "s": 52.993,
+   "e": 54.337
+  },
+  {
+   "text": "far away,",
+   "s": 54.755,
+   "e": 55.383
+  },
+  {
+   "text": "and gently pulled.",
+   "s": 55.884,
+   "e": 56.721
+  },
+  {
+   "text": "And the giant ship slid across the sand toward him,",
+   "s": 57.438,
+   "e": 59.985
+  },
+  {
+   "text": "as smoothly as if it were floating. Today, every crane,",
+   "s": 60.4,
+   "e": 62.194
+  },
+  {
+   "text": "elevator and tow truck uses that same idea.",
+   "s": 62.883,
+   "e": 66.245
+  },
+  {
+   "text": "Trade distance for strength,",
+   "s": 66.873,
+   "e": 67.95
+  },
+  {
+   "text": "and one person can move a ship.",
+   "s": 68.274,
+   "e": 69.624
+  }
+ ]
+}
