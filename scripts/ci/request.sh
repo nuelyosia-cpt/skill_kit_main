@@ -13,7 +13,9 @@ if [ -z "$SLUG" ]; then
 fi
 [ -n "$SLUG" ] || { echo "no projects/<slug>/render.txt in this push"; exit 1; }
 P="projects/$SLUG"; R="$P/render.txt"
-[ -f "$R" ] && [ -f "$P/voice.mp3" ] || { echo "$R or $P/voice.mp3 missing"; exit 1; }
+[ -f "$R" ] || { echo "$R missing"; exit 1; }
+if [ ! -f "$P/voice.mp3" ]; then   # new project without a voice yet: nothing to render, skip quietly
+  echo "$P/voice.mp3 not uploaded yet: skipping"; { echo "slug=$SLUG"; echo "mode=skip"; } | tee -a "${GITHUB_OUTPUT:-/dev/stdout}"; exit 0; fi
 get() { grep -E "^$1:" "$R" | head -1 | sed -E "s/^$1:[[:space:]]*//; s/[[:space:]]+#.*$//; s/[[:space:]]+$//" || true; }
 MODE=$(get mode); MODE=${MODE:-stills}
 TITLE=$(get title); TITLE=${TITLE:-$SLUG}
