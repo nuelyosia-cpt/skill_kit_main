@@ -151,6 +151,19 @@ def water(d):
     n = int(d * SR); t = np.arange(n) / SR
     return (lp_fast(noise(d), 900) * 0.5 + hp_fast(lp_fast(noise(d), 3000), 1200) * 0.15 * (0.6 + 0.4 * np.sin(2 * np.pi * 0.4 * t))).astype(np.float32)
 
+def shimmer(d=1.6):
+    n = int(d * SR); t = np.arange(n) / SR; s = np.zeros(n)
+    for k, f0 in enumerate([880, 1320, 1760, 2200]): s += np.sin(2 * np.pi * np.cumsum(f0 * (1 + 0.6 * t / d)) / SR) * (0.5 + 0.5 * np.sin(2 * np.pi * (6 + k) * t))
+    return (s * (t / d) ** 2 * 0.25).astype(np.float32)
+def clack(): n = int(0.1 * SR); t = np.arange(n) / SR; return (np.sin(2 * np.pi * 900 * t) * np.exp(-t * 70) + hp_fast(noise(0.1), 1500) * np.exp(-t * 90) * 0.4).astype(np.float32)
+def pop(): n = int(0.12 * SR); t = np.arange(n) / SR; return (np.sin(2 * np.pi * np.cumsum(300 + 900 * t / 0.12) / SR) * np.exp(-t * 30)).astype(np.float32)
+def boing():
+    n = int(0.5 * SR); t = np.arange(n) / SR; f = 520 * np.exp(-t * 3) + 120
+    return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 5)).astype(np.float32)
+def rustle(d=0.6):
+    x = hp_fast(lp_fast(noise(d), 5000), 1500); n = len(x); t = np.arange(n) / SR
+    return (x * (0.5 + 0.5 * np.abs(np.sin(2 * np.pi * 7 * t))) * np.minimum(1, (d - t) / 0.2)).astype(np.float32)
+
 F = lambda f: f / 30
 place(sfx, whoosh(0.6), F(18), 0.5)            # hook camera pull-back
 place(sfx, leaves(2.2), F(62), 0.35)           # the years blow past

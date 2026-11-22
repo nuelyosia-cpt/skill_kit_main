@@ -1,0 +1,327 @@
+{
+ "duration": 63.373061,
+ "frames30": 1901,
+ "source": "silence-align (cost 2.83)",
+ "segments": [
+  [
+   0.180181,
+   2.63245
+  ],
+  [
+   2.94268,
+   4.031
+  ],
+  [
+   4.61712,
+   5.00955
+  ],
+  [
+   5.28594,
+   6.16336
+  ],
+  [
+   6.38531,
+   7.4173
+  ],
+  [
+   7.92229,
+   8.4858
+  ],
+  [
+   8.76878,
+   9.75825
+  ],
+  [
+   10.0521,
+   11.4289
+  ],
+  [
+   11.5552,
+   12.9278
+  ],
+  [
+   13.4391,
+   15.5386
+  ],
+  [
+   16.1299,
+   17.6507
+  ],
+  [
+   18.0151,
+   19.6039
+  ],
+  [
+   19.9364,
+   20.7234
+  ],
+  [
+   20.998,
+   22.3273
+  ],
+  [
+   22.5733,
+   23.0094
+  ],
+  [
+   23.6299,
+   25.0572
+  ],
+  [
+   25.442,
+   26.8587
+  ],
+  [
+   27.1211,
+   28.3923
+  ],
+  [
+   28.9983,
+   30.3584
+  ],
+  [
+   30.7605,
+   32.2279
+  ],
+  [
+   32.5104,
+   34.6567
+  ],
+  [
+   35.2744,
+   36.5646
+  ],
+  [
+   36.874,
+   38.8593
+  ],
+  [
+   39.1455,
+   40.4478
+  ],
+  [
+   40.7546,
+   41.4151
+  ],
+  [
+   41.6631,
+   42.9296
+  ],
+  [
+   43.2083,
+   44.8229
+  ],
+  [
+   45.3956,
+   46.7235
+  ],
+  [
+   47.0409,
+   49.8619
+  ],
+  [
+   50.5093,
+   50.9867
+  ],
+  [
+   51.3248,
+   53.8866
+  ],
+  [
+   54.2428,
+   54.8928
+  ],
+  [
+   55.4817,
+   56.7211
+  ],
+  [
+   56.9566,
+   57.567
+  ],
+  [
+   58.1702,
+   59.7551
+  ],
+  [
+   60.317,
+   62.0677
+  ],
+  [
+   62.3995,
+   63.105
+  ]
+ ],
+ "phrases": [
+  {
+   "text": "The Mona Lisa wasn't the most famous painting in the world,",
+   "s": 0.18,
+   "e": 2.632
+  },
+  {
+   "text": "until somebody stole it.",
+   "s": 2.943,
+   "e": 4.031
+  },
+  {
+   "text": "Paris,",
+   "s": 4.617,
+   "e": 5.01
+  },
+  {
+   "text": "August 1911.",
+   "s": 5.286,
+   "e": 6.163
+  },
+  {
+   "text": "On a Monday,",
+   "s": 6.385,
+   "e": 7.417
+  },
+  {
+   "text": "when the Louvre is closed,",
+   "s": 7.922,
+   "e": 9.758
+  },
+  {
+   "text": "a man in a white worker's smock walks calmly out of the museum.",
+   "s": 10.052,
+   "e": 12.928
+  },
+  {
+   "text": "Under the smock is Leonardo da Vinci's portrait.",
+   "s": 13.439,
+   "e": 15.539
+  },
+  {
+   "text": "His name is Vincenzo Peruggia.",
+   "s": 16.13,
+   "e": 17.651
+  },
+  {
+   "text": "He had worked at the Louvre as a handyman,",
+   "s": 18.015,
+   "e": 19.604
+  },
+  {
+   "text": "so the night before,",
+   "s": 19.936,
+   "e": 20.723
+  },
+  {
+   "text": "he simply hid in a storage cupboard and waited.",
+   "s": 20.998,
+   "e": 23.009
+  },
+  {
+   "text": "His plan was almost too simple.",
+   "s": 23.63,
+   "e": 25.057
+  },
+  {
+   "text": "He dressed exactly like the staff,",
+   "s": 25.442,
+   "e": 26.859
+  },
+  {
+   "text": "so nobody looked twice.",
+   "s": 27.121,
+   "e": 28.392
+  },
+  {
+   "text": "When the guards noticed the empty wall,",
+   "s": 28.998,
+   "e": 30.358
+  },
+  {
+   "text": "they assumed she was being photographed.",
+   "s": 30.761,
+   "e": 32.228
+  },
+  {
+   "text": "It took more than a day before anyone raised the alarm.",
+   "s": 32.51,
+   "e": 34.657
+  },
+  {
+   "text": "Then the world went crazy.",
+   "s": 35.274,
+   "e": 36.565
+  },
+  {
+   "text": "Her face was printed in newspapers everywhere.",
+   "s": 36.874,
+   "e": 38.859
+  },
+  {
+   "text": "The museum closed for a week.",
+   "s": 39.145,
+   "e": 40.448
+  },
+  {
+   "text": "When it reopened,",
+   "s": 40.755,
+   "e": 41.415
+  },
+  {
+   "text": "crowds queued for hours,",
+   "s": 41.663,
+   "e": 42.93
+  },
+  {
+   "text": "just to stare at four empty hooks.",
+   "s": 43.208,
+   "e": 44.823
+  },
+  {
+   "text": "The police questioned everyone.",
+   "s": 45.396,
+   "e": 46.724
+  },
+  {
+   "text": "Even a young painter named Pablo Picasso was brought in for questioning.",
+   "s": 47.041,
+   "e": 49.862
+  },
+  {
+   "text": "Meanwhile,",
+   "s": 50.509,
+   "e": 50.987
+  },
+  {
+   "text": "the real thief kept her hidden in a trunk in his small Paris room,",
+   "s": 51.325,
+   "e": 53.887
+  },
+  {
+   "text": "for two years.",
+   "s": 54.243,
+   "e": 54.893
+  },
+  {
+   "text": "He was finally caught in Florence,",
+   "s": 55.482,
+   "e": 56.721
+  },
+  {
+   "text": "trying to sell her.",
+   "s": 56.957,
+   "e": 57.567
+  },
+  {
+   "text": "But by then, everybody knew her face.",
+   "s": 58.17,
+   "e": 59.755
+  },
+  {
+   "text": "The thief didn't steal the Mona Lisa's fame.",
+   "s": 60.317,
+   "e": 62.068
+  },
+  {
+   "text": "He created it.",
+   "s": 62.4,
+   "e": 63.105
+  }
+ ]
+}

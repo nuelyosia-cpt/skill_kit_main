@@ -79,11 +79,11 @@ from music import bed, STYLES   # calm music library (see music.py for styles an
 # One calm bed per video. Change STYLE / MOOD / SEED every video so no two shorts sound alike:
 #   STYLE: lofi, chillhop, explainer, synthwave, cinematic, trap
 #   MOOD:  dreamy, curious, mystery, epic
-STYLE, MOOD, SEED = "cinematic", "mystery", 3
-MUSIC_END = 14.15  # twist ending: the music stops on "The bridge is not safe" (use resolve= for a moral/engagement ending)
+STYLE, MOOD, SEED = "cinematic", "mystery", 7
 music = bed(DUR, style=STYLE, mood=MOOD, seed=SEED,
-            sections=[(0, "soft"), (5.0, "normal"), (11.0, "tense")],   # (seconds, rest|soft|normal|tense)
-            swell=[], stop=MUSIC_END, resolve=None)[:N]
+            sections=[(0, "soft"), (4.6, "normal"), (19.9, "tense"), (23.6, "normal"), (29.0, "soft"), (35.2, "normal"),
+                      (50.5, "tense"), (55.4, "normal"), (58.1, "soft"), (60.2, "normal")],
+            swell=[62.6], stop=None, resolve=62.9)[:N]
 music = np.pad(music, (0, max(0, N - len(music))))
 
 # ---------------- sfx ----------------
@@ -151,26 +151,74 @@ def water(d):
     n = int(d * SR); t = np.arange(n) / SR
     return (lp_fast(noise(d), 900) * 0.5 + hp_fast(lp_fast(noise(d), 3000), 1200) * 0.15 * (0.6 + 0.4 * np.sin(2 * np.pi * 0.4 * t))).astype(np.float32)
 
-F = lambda f: f / 30
-place(sfx, whoosh(0.6), F(18), 0.5)            # hook camera pull-back
-place(sfx, leaves(2.2), F(62), 0.35)           # the years blow past
-place(sfx, thunk(85, 0.35), F(120), 1.0)       # spear stamp on "post"
-place(sfx, rumble(2.2), F(176), 0.9)           # empire collapses
-place(sfx, crash(1.4), F(186), 0.7)
-place(sfx, whoosh(0.5), F(196), 0.35)          # rack to the soldier
-place(sfx, cuckoo(), F(255), 0.35)             # "crazy"
-place(sfx, whoosh(0.4), F(276), 0.6)           # time jump flash
-for k in range(2): place(sfx, snore(1.15), F(286) + k * 1.45, 0.45)
-place(sfx, scrape(0.9), F(316), 0.6)           # helmet lifted
-place(sfx, ting(), F(392), 0.55)               # the carving glints
-place(sfx, sting(), 14.18, 0.85)               # "The bridge is not safe."
-place(sfx, creak(0.55, 120), F(464), 0.9); place(sfx, creak(0.5, 160), F(473), 0.7)
-place(sfx, whoosh(0.7), F(484), 0.5)           # crane under the deck
-place(sfx, water(DUR - F(484)), F(484), 0.35)
-place(sfx, creak(0.8, 90), F(536), 1.0)
-place(sfx, snap(), F(548), 0.9)                # brace breaks on "rotting"
-place(sfx, splash(1.0), F(580), 0.9)
+def shimmer(d=1.6):
+    n = int(d * SR); t = np.arange(n) / SR; s = np.zeros(n)
+    for k, f0 in enumerate([880, 1320, 1760, 2200]): s += np.sin(2 * np.pi * np.cumsum(f0 * (1 + 0.6 * t / d)) / SR) * (0.5 + 0.5 * np.sin(2 * np.pi * (6 + k) * t))
+    return (s * (t / d) ** 2 * 0.25).astype(np.float32)
+def clack(): n = int(0.1 * SR); t = np.arange(n) / SR; return (np.sin(2 * np.pi * 900 * t) * np.exp(-t * 70) + hp_fast(noise(0.1), 1500) * np.exp(-t * 90) * 0.4).astype(np.float32)
+def pop(): n = int(0.12 * SR); t = np.arange(n) / SR; return (np.sin(2 * np.pi * np.cumsum(300 + 900 * t / 0.12) / SR) * np.exp(-t * 30)).astype(np.float32)
+def boing():
+    n = int(0.5 * SR); t = np.arange(n) / SR; f = 520 * np.exp(-t * 3) + 120
+    return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 5)).astype(np.float32)
+def rustle(d=0.6):
+    x = hp_fast(lp_fast(noise(d), 5000), 1500); n = len(x); t = np.arange(n) / SR
+    return (x * (0.5 + 0.5 * np.abs(np.sin(2 * np.pi * 7 * t))) * np.minimum(1, (d - t) / 0.2)).astype(np.float32)
 
+F = lambda f: f / 30
+def pop(): n = int(0.12 * SR); t = np.arange(n) / SR; return (np.sin(2 * np.pi * np.cumsum(300 + 900 * t / 0.12) / SR) * np.exp(-t * 30)).astype(np.float32)
+def steps(n_, gap, f0=180, g=0.3, t0=0.0):
+    out = []
+    for k in range(n_):
+        m = int(0.09 * SR); t = np.arange(m) / SR; out.append((t0 + k * gap, (np.sin(2 * np.pi * f0 * t) * np.exp(-t * 50) + hp_fast(noise(0.09), 1200) * np.exp(-t * 70) * 0.4).astype(np.float32)))
+    return out
+def tick(): n = int(0.05 * SR); t = np.arange(n) / SR; return (np.sin(2 * np.pi * 2600 * t) * np.exp(-t * 90)).astype(np.float32)
+def bellring(d=1.6):
+    n = int(d * SR); t = np.arange(n) / SR; tr = (np.sin(2 * np.pi * 22 * t) > 0).astype(np.float32)
+    return ((np.sin(2 * np.pi * 1900 * t) + 0.5 * np.sin(2 * np.pi * 2630 * t)) * tr * np.exp(-t * 0.8) * 0.5).astype(np.float32)
+def crowd(d): return (lp_fast(noise(d), 900) * 0.45 * np.minimum(1, np.arange(int(d * SR)) / SR / 0.4)).astype(np.float32)
+def shutter(): n = int(0.18 * SR); t = np.arange(n) / SR; return (hp_fast(noise(0.18), 2000) * (np.exp(-t * 80) + np.exp(-np.maximum(0, t - 0.08) * 80) * (t > 0.08)) * 0.8).astype(np.float32)
+def paperflap(d=0.4): x = hp_fast(lp_fast(noise(d), 5000), 800); t = np.arange(len(x)) / SR; return (x * (0.4 + 0.6 * np.abs(np.sin(2 * np.pi * 14 * t))) * np.sin(np.pi * t / d) * 0.6).astype(np.float32)
+def door_creak(): return creak(0.9, 90)
+def gasp(): n = int(0.4 * SR); t = np.arange(n) / SR; return (lp_fast(hp_fast(noise(0.4), 600), 3000) * np.sin(np.pi * t / 0.4) ** 2 * 0.6).astype(np.float32)
+
+# --- cues follow the picture (frames / 30) ---
+for k in range(4): [place(sfx, sig, t, 0.25) for t, sig in steps(6, 0.55, 170 + k * 8, t0=0.2 + k * 0.25)]   # visitors stroll past
+place(sfx, whoosh(0.9), F(30), 0.35)                       # pull back from the painting
+place(sfx, whoosh(0.3), F(106), 0.5); place(sfx, pop(), F(110), 0.5); place(sfx, thunk(120, 0.25), F(112), 0.4)   # she vanishes on "stole"
+place(sfx, whoosh(0.4), F(136), 0.45)                      # flash to Paris
+place(sfx, leaves(3.0), F(138), 0.3)                       # dawn street ambience
+place(sfx, pop(), F(150), 0.4)                             # title card
+place(sfx, pop(), F(240), 0.4)                             # FERMÉ sign
+place(sfx, door_creak(), F(304), 0.5)                      # the door opens
+for t, sig in steps(9, 0.4, 200, t0=F(312)): place(sfx, sig, t, 0.35)   # he strolls out
+place(sfx, shimmer(1.0), F(395), 0.35); place(sfx, pop(), F(423), 0.5)  # x-ray reveal
+place(sfx, ting(), F(514), 0.35)                           # wink on "Peruggia"
+place(sfx, clack() if 'clack' in dir() else thunk(300, 0.1), F(560), 0.3)
+place(sfx, whoosh(0.4), F(596), 0.4)                       # into the cupboard
+for k in range(7): place(sfx, tick(), F(605) + k * 0.5, 0.4)        # waiting in the dark
+place(sfx, snore(1.2), F(676), 0.3)
+for t, sig in steps(14, 0.35, 190, t0=F(712)): place(sfx, sig, t, 0.3)   # workers walk past
+place(sfx, shutter(), F(951), 0.45)                        # "photographed"
+for k in range(16): place(sfx, tick(), F(978) + k * 0.1, 0.25)      # a day spins by
+place(sfx, gasp(), F(1018), 0.4); place(sfx, bellring(1.6), F(1029), 0.45)   # the alarm
+place(sfx, whoosh(0.4), F(1056), 0.4); place(sfx, crowd(3.8), F(1058), 0.4)  # the world goes crazy
+for k in range(6): place(sfx, paperflap(0.4), F(1106 + k * 7), 0.4)     # newspapers fly
+place(sfx, pop(), F(1174), 0.35); place(sfx, pop(), F(1231), 0.45)     # FERMÉ → OUVERT
+for t, sig in steps(10, 0.12, 210, t0=F(1231)): place(sfx, sig, t, 0.3)  # the crowd rushes in
+place(sfx, crowd(3.6), F(1248), 0.45); place(sfx, gasp(), F(1285), 0.35)
+place(sfx, whoosh(0.4), F(1359), 0.4); place(sfx, ting(), F(1370), 0.2)  # police office
+place(sfx, thunk(90, 0.3), F(1454), 0.45); place(sfx, pop(), F(1455), 0.4)   # "Picasso" + label
+place(sfx, whoosh(0.4), F(1513), 0.4)                      # attic
+place(sfx, creak(0.7, 110), F(1572), 0.5)                  # trunk lid creaks open
+place(sfx, shimmer(0.8), F(1590), 0.25)
+for k in range(3): place(sfx, paperflap(0.3), F(1627 + k * 9), 0.35)    # calendar pages
+place(sfx, whoosh(0.4), F(1662), 0.4)                      # Florence
+place(sfx, thunk(70, 0.4), F(1685), 0.5); place(sfx, gasp(), F(1690), 0.35)  # caught
+place(sfx, whoosh(0.4), F(1743), 0.45); place(sfx, crowd(2.2), F(1745), 0.35)  # today
+for k in range(6): place(sfx, shutter(), F(1758 + k * 5), 0.3)           # phone cameras
+for f0 in (1754, 1766, 1778, 1786): place(sfx, pop(), F(f0), 0.35)     # posters, mug, phone
+place(sfx, whoosh(1.2), F(1809), 0.3)                      # push in on her face
+place(sfx, ting(), F(1877), 0.5)                           # she winks on "created"
 def write_stem(path, x):
     x = np.asarray(x, np.float32)
     peak = float(np.abs(x).max()) or 1.0

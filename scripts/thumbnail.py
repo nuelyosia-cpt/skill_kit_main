@@ -9,6 +9,7 @@ for the channel page / long-form use). The frame must be a caption-free render f
 (frames/ or stills/), never a frame grabbed from the final MP4.
 
 Text: 2-6 words, upper case, big. Wrap words in *stars* to colour them yellow.
+--top 0.36      caption box bottom (fraction of the height); lower it if the caption covers a face.
 --circle x,y,r  draws a red highlight ring around the key object (1080x1920 coordinates).
 --focus 0..1    vertical centre of the interesting part (for the 16:9 crop), default 0.4.
 """
@@ -75,14 +76,14 @@ def ring(img, cx, cy, r, scale=1.0):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("frame"); ap.add_argument("text"); ap.add_argument("out")
-    ap.add_argument("--circle", default=None); ap.add_argument("--focus", type=float, default=0.4); ap.add_argument("--font", default=None)
+    ap.add_argument("--circle", default=None); ap.add_argument("--top", type=float, default=0.36, help="caption box bottom as a fraction of the height (9:16)"); ap.add_argument("--focus", type=float, default=0.4); ap.add_argument("--font", default=None)
     a = ap.parse_args(); font = find_font(a.font)
     src = grade(Image.open(a.frame).convert("RGB").resize((1080, 1920), Image.LANCZOS))
     circ = [int(v) for v in a.circle.split(",")] if a.circle else None
     # 9:16
-    v = top_shade(src, 760)
+    v = top_shade(src, int(1920 * a.top) + 60)
     if circ: ring(v, *circ)
-    draw_text(v, a.text, font, (60, 110, 1020, 700), 3, 150)
+    draw_text(v, a.text, font, (60, 90, 1020, int(1920 * a.top)), 3, 150)
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
     v.save(a.out + "_9x16.jpg", quality=92)
     # 16:9: blurred backdrop, the vertical frame on the right, text on the left

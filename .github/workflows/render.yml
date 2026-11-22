@@ -125,10 +125,10 @@ jobs:
           python mix.py voice.mp3 music.wav sfx.wav 2>&1 | tee -a out/ci.log
           # thumbnail (made first: finish.sh puts it on the opening frames) from a caption-free frame (render.txt: thumb, thumb_text, thumb_circle, thumb_focus)
           get() { grep -E "^$1:" render.txt | head -1 | sed -E "s/^$1:[[:space:]]*//; s/[[:space:]]+$//" || true; }
-          TF=$(get thumb); TT=$(get thumb_text); TC=$(get thumb_circle); TFO=$(get thumb_focus)
+          TF=$(get thumb); TT=$(get thumb_text); TC=$(get thumb_circle); TFO=$(get thumb_focus); TTOP=$(get thumb_top)
           if [ -n "$TF" ] && [ -n "$TT" ]; then
             FR="frames/f$(printf %04d "$TF").jpg"
-            python ../../scripts/thumbnail.py "$FR" "$TT" out/thumb ${TC:+--circle "$TC"} ${TFO:+--focus "$TFO"} --font ../../assets/fonts/LuckiestGuy-Regular.ttf 2>&1 | tee -a out/ci.log
+            python ../../scripts/thumbnail.py "$FR" "$TT" out/thumb ${TC:+--circle "$TC"} ${TFO:+--focus "$TFO"} ${TTOP:+--top "$TTOP"} --font ../../assets/fonts/LuckiestGuy-Regular.ttf 2>&1 | tee -a out/ci.log
           else echo "thumbnail: skipped (no thumb/thumb_text in render.txt)" | tee -a out/ci.log; fi
           bash finish.sh "$SLUG" 2>&1 | tee -a out/ci.log
           test -s "out/$SLUG.mp4"
