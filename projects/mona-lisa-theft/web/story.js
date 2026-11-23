@@ -63,7 +63,7 @@ const CAMS = {
   ],
   paris: [
     { f: 138, pos: [EXT[0] + 14, 22, 46], look: [EXT[0], 9, -10], fov: 50 },
-    { f: 236, pos: [EXT[0] + 8, 6, 30], look: [EXT[0], 5, -8], fov: 48, ease: 'smooth' },
+    { f: 236, pos: [EXT[0] + 9, 11, 34], look: [EXT[0], 7, -8], fov: 48, ease: 'smooth' },
   ],
   closed: [
     { f: 237, pos: [EXT[0] + 2.0, 2.4, 1.8], look: [EXT[0], 2.4, -5.6], fov: 40 },
@@ -82,8 +82,8 @@ const CAMS = {
     { f: 539, pos: [EXT[0] + 0.5, 1.62, 2.3], look: frame([EXT[0] + 0.5, 1.62, 2.3], of([EXT[0], 0, 0]), 32), fov: 32, roll: -2 },
   ],
   handy: [
-    { f: 540, pos: [3.6, 2.2, -3.2], look: [0.2, 2.0, -8.2], fov: 46 },
-    { f: 597, pos: [3.2, 2.1, -3.8], look: [0.2, 2.0, -8.2], fov: 44 },
+    { f: 540, pos: [3.6, 1.5, -3.2], look: [0.2, 1.3, -8.2], fov: 46 },
+    { f: 597, pos: [3.2, 1.5, -3.8], look: [0.2, 1.3, -8.2], fov: 44 },
   ],
   cup: [
     { f: 598, pos: [CUP[0] + 0.5, 1.4, 1.4], look: [CUP[0], 1.0, -0.6], fov: 50 },
@@ -274,7 +274,7 @@ export const fxAt = (f, T) => {
   const S = shotAt(f), out = [];
   const pop = (f0) => E.back(ramp(f, f0, f0 + 7), 2);
   if (S.id === 'stole' && f >= 110 && f < 128) { const t = q((f - 110) / 18, 2); out.push(FX('puff' + t, (p) => T.fxDust(p, t, '#e8dcc4'), [0, 1.65, -8.4], 0.55)); }
-  if (S.id === 'paris' && f >= 150) { const k = pop(150); out.push(FX('ttl' + q(k, 2), titleCard('PARIS', 'AUGUST 1911'), [EXT[0] + 2, 8, 6], q(9 * k, 2))); }
+  if (S.id === 'paris' && f >= 150) { const k = pop(150); out.push(FX('ttl' + q(k, 2), titleCard('PARIS', 'AUGUST 1911'), [EXT[0] + 2, 6.5, 6], q(8 * k, 2))); }
   if (S.id === 'closed' && f >= 240) { const k = pop(240); out.push(FX('ferme' + q(k, 2), sign('FERMÉ', 'CLOSED MONDAY'), [EXT[0], 1.25, -5.4], q(1.3 * k, 2))); }
   if (S.id === 'under' && f >= 423) { const k = pop(423); out.push(FX('xr' + q(k, 2), xray, [EXT[0], -0.1, 0.08], q(0.8 * k, 2), { order: 7 })); }
   if (S.id === 'name' && f >= 499) { const k = pop(499); out.push(FX('nm' + q(k, 2), titleCard('VINCENZO', 'PERUGGIA'), [EXT[0] - 0.2, 1.25, -0.4], q(1.15 * k, 2), { order: 6 })); }
