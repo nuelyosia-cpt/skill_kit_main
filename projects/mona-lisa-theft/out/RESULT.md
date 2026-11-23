@@ -1,8 +1,8 @@
 # Render result: The Theft That Made the Mona Lisa Famous
 
-- MP4: https://github.com/nuelyosia-cpt/skill_kit_main/releases/tag/mona-lisa-theft-r17
-- length: 63.333333 s, size: 35253714 bytes
-- run: https://github.com/nuelyosia-cpt/skill_kit_main/actions/runs/45082452751
+- MP4: https://github.com/nuelyosia-cpt/skill_kit_main/releases/tag/mona-lisa-theft-r18
+- length: 63.333333 s, size: 35060413 bytes
+- run: https://github.com/nuelyosia-cpt/skill_kit_main/actions/runs/45121362478
 
 ## Mix and QA log
 
